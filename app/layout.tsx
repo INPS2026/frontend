@@ -4,6 +4,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import QueryProvider from '@/providers/query-provider';
 import { Toaster } from '@/components/ui/toast';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -41,7 +42,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
           <Toaster />
         </QueryProvider>
       </body>
