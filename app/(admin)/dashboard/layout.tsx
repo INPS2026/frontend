@@ -9,7 +9,7 @@ const navLinks = [
   },
   {
     label: 'Student',
-    items: [{ label: 'Register Student', path: 'dashboard/student/new' }],
+    items: [{ label: 'Register Student', path: '/dashboard/student/new' }],
   },
 ];
 
@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
     <div>
       <SidebarProvider>
         <AppSidebar links={navLinks} />
-        <main>{children}</main>
+        <main className="bg-muted grow">{children}</main>
       </SidebarProvider>
     </div>
   );
