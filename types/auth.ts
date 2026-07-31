@@ -20,3 +20,9 @@ export type LoginResponse = {
   role: string;
   user: Staff;
 };
+
+export interface RefreshStaffTokenResponse {
+  success: boolean;
+  token: string;
+  refreshToken: string;
+}

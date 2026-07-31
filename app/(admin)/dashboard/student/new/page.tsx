@@ -20,7 +20,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/toast';
+import { useRegisterStudent } from '@/service/api/admin/students.api';
+import {
+  NewStudentFormInput,
+  NewStudentFormOutput,
+  NewStudentSchema,
+} from '@/types/student';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isAxiosError } from 'axios';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -29,95 +37,6 @@ import {
   useFormContext,
   Controller,
 } from 'react-hook-form';
-import z from 'zod';
-
-const optionalNonEmptyString = (message: string) =>
-  z
-    .string()
-    .optional()
-    .refine((val) => !val || val.trim().length >= 1, { message });
-
-const dateField = (message: string) =>
-  z
-    .string()
-    .min(1, message)
-    .transform((val) => new Date(val))
-    .pipe(z.date());
-
-const NewStudentSchema = z
-  .object({
-    firstName: z.string().min(3, 'First name is too short'),
-    lastName: z.string().min(3, 'Last name is too short'),
-    gender: z.enum(['male', 'female', 'other']),
-    dateOfBirth: dateField('Date of birth is required'),
-    nationality: optionalNonEmptyString('Nationality is too short'),
-    state: optionalNonEmptyString('State is too short'),
-    lga: optionalNonEmptyString('LGA is too short'),
-    religion: z.enum(['christianity', 'islam', 'other']).optional(),
-    healthInfo: optionalNonEmptyString('Health information is too short'),
-    sportHouse: optionalNonEmptyString('Sport house is too short'),
-    address: optionalNonEmptyString('Address is too short'),
-    intakeType: optionalNonEmptyString('Intake type too short'),
-    admissionDate: dateField('Admission date is required'),
-    graduationDate: z
-      .string()
-      .transform((val) => (val ? new Date(val) : undefined))
-      .pipe(z.date().optional())
-      .optional(),
-    accountEmail: z.email(),
-    accountPhone: z.string().min(3, 'Enter a valid phone number'),
-    parentData: z.object({
-      fatherFirstName: z.string().min(3, 'Father first name is too short'),
-      fatherLastName: z.string().min(3, 'Father last name is too short'),
-      fatherOccupation: z.string().min(3, 'Father occupation is too short'),
-      fatherEmail: z.email(),
-      fatherPhone: z.string().min(3, 'Enter a valid phone number'),
-      motherFirstName: z.string().min(3, 'Mother first name is too short'),
-      motherLastName: z.string().min(3, 'Mother last name is too short'),
-      motherOccupation: z.string().min(3, 'Mother occupation is too short'),
-      motherEmail: z.email(),
-      motherPhone: z.string().min(3, 'Enter a valid phone number'),
-      address: z.string().min(10, 'Address is too short'),
-      maritalStatus: z.enum(['single', 'divorced', 'married', 'other']),
-    }),
-    passportPhoto: z
-      .file()
-      .max(2 * 1024 * 1024, 'Photo must be under 2MB')
-      .refine((f) => ['image/jpeg', 'image/png'].includes(f.type), {
-        message: 'Photo must be a JPEG or PNG',
-      })
-      .optional(),
-    admissionDocs: z
-      .array(z.file().max(5 * 1024 * 1024, 'Each document must be under 5MB'))
-      .max(10, 'You can upload up to 10 documents')
-      .optional(),
-  })
-  .refine(
-    (data) => !data.graduationDate || data.graduationDate > data.admissionDate,
-    {
-      message: 'Graduation date must be after admission date',
-      path: ['graduationDate'],
-    },
-  )
-  .refine(
-    (data) => {
-      if (!data.admissionDate || !data.dateOfBirth) {
-        return true;
-      }
-
-      const age =
-        (data.admissionDate.getTime() - data.dateOfBirth.getTime()) /
-        (1000 * 60 * 60 * 24 * 365.25);
-      return age >= 2 && age <= 25;
-    },
-    {
-      message: 'Date of birth does not match a valid student age at admission',
-      path: ['dateOfBirth'],
-    },
-  );
-
-type NewStudentFormInput = z.input<typeof NewStudentSchema>;
-type NewStudentFormOutput = z.output<typeof NewStudentSchema>;
 
 const steps = [
   {
@@ -255,9 +174,8 @@ const StudentInfo = () => {
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="MALE">Male</SelectItem>
+                    <SelectItem value="FEMALE">Female</SelectItem>
                   </SelectContent>
                 </Select>
                 {fieldState.invalid && (
@@ -273,7 +191,7 @@ const StudentInfo = () => {
             name="nationality"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Nationality</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Nationality*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -290,7 +208,7 @@ const StudentInfo = () => {
             name="state"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>State</FieldLabel>
+                <FieldLabel htmlFor={field.name}>State*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -309,7 +227,7 @@ const StudentInfo = () => {
             name="lga"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>LGA</FieldLabel>
+                <FieldLabel htmlFor={field.name}>LGA*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -355,7 +273,7 @@ const StudentInfo = () => {
             name="address"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Address</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Address*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -372,7 +290,7 @@ const StudentInfo = () => {
             name="sportHouse"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Sport house</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Sport house*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -390,7 +308,7 @@ const StudentInfo = () => {
           name="healthInfo"
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Health info</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Health info*</FieldLabel>
               <Textarea
                 {...field}
                 id={field.name}
@@ -500,12 +418,21 @@ const AdmissionInfo = () => {
             name="intakeType"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Intake type</FieldLabel>
-                <Input
-                  {...field}
-                  id={field.name}
+                <FieldLabel htmlFor={field.name}>Intake type*</FieldLabel>
+                <Select
+                  name={field.name}
+                  value={field.value}
+                  onValueChange={field.onChange}
                   aria-invalid={fieldState.invalid}
-                />
+                >
+                  <SelectTrigger id={field.name}>
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NEW">New</SelectItem>
+                    <SelectItem value="CONTINUING">Continuing</SelectItem>
+                  </SelectContent>
+                </Select>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -694,7 +621,7 @@ const ParentInfo = () => {
             name="parentData.fatherOccupation"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Father Occupation</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Father Occupation*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -711,7 +638,7 @@ const ParentInfo = () => {
             name="parentData.motherOccupation"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Mother Occupation</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Mother Occupation*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -730,7 +657,7 @@ const ParentInfo = () => {
             name="parentData.address"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Address</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Address*</FieldLabel>
                 <Input
                   {...field}
                   id={field.name}
@@ -747,7 +674,7 @@ const ParentInfo = () => {
             name="parentData.maritalStatus"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Marital</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Marital*</FieldLabel>
                 <Select
                   name={field.name}
                   value={field.value}
@@ -889,13 +816,13 @@ export default function RegisterNewStudentPage() {
       firstName: '',
       lastName: '',
       dateOfBirth: '',
-      gender: 'other',
+      gender: 'MALE',
       nationality: '',
       state: '',
       lga: '',
       religion: 'other',
       address: '',
-      intakeType: '',
+      intakeType: 'NEW',
       admissionDate: '',
       graduationDate: '',
       sportHouse: '',
@@ -918,6 +845,7 @@ export default function RegisterNewStudentPage() {
       },
     },
   });
+  const registerStudent = useRegisterStudent();
 
   const handleNext = async () => {
     const fieldsToValidate = steps[currentStep].fields;
@@ -933,49 +861,70 @@ export default function RegisterNewStudentPage() {
     setCurrentStep((s) => Math.max(s - 1, 0));
   };
 
-  function onSubmit(data: NewStudentFormOutput) {
-    console.log(data);
+  async function onSubmit(data: NewStudentFormOutput) {
+    try {
+      const res = await registerStudent.mutateAsync(data);
+      toast.add({
+        title: 'Registration complete',
+        description: res.message,
+      });
+      form.reset();
+      setCurrentStep(0);
+    } catch (err) {
+      if (isAxiosError(err)) {
+        toast.add({
+          title: 'Registration failed',
+          description: err?.message,
+        });
+      } else {
+        toast.add({
+          title: 'Failed to register student',
+        });
+      }
+    }
   }
 
   return (
     <div className="space-y-4">
       <TopBar title="Register new student" />
 
-      <div className="">
-        <div className="bg-sidebar p-4 shadow-sm">
-          <FormProvider {...form}>
-            <div className="max-w-2xl mx-auto space-y-4">
-              <form
-                id="register-student-form"
-                onSubmit={form.handleSubmit(onSubmit)}
+      <div className="bg-sidebar p-4 shadow-sm">
+        <FormProvider {...form}>
+          <div className="max-w-2xl mx-auto space-y-4">
+            <form
+              id="register-student-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              {currentStep === 0 && <StudentInfo />}
+              {currentStep === 1 && <AdmissionInfo />}
+              {currentStep === 2 && <ParentInfo />}
+              {currentStep === 3 && <Documents />}
+            </form>
+            <div className="flex justify-end gap-2">
+              <Button
+                size="lg"
+                variant="outline"
+                disabled={currentStep === 0}
+                onClick={handleBack}
               >
-                {currentStep === 0 && <StudentInfo />}
-                {currentStep === 1 && <AdmissionInfo />}
-                {currentStep === 2 && <ParentInfo />}
-                {currentStep === 3 && <Documents />}
-              </form>
-              <div className="flex justify-end gap-2">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  disabled={currentStep === 0}
-                  onClick={handleBack}
-                >
-                  Previous
+                Previous
+              </Button>
+              {currentStep < steps.length - 1 ? (
+                <Button key="next-btn" size="lg" onClick={handleNext}>
+                  Next
                 </Button>
-                {currentStep < steps.length - 1 ? (
-                  <Button size="lg" onClick={handleNext}>
-                    Next
-                  </Button>
-                ) : (
-                  <Button type="submit" form="register-student-form">
-                    Submit
-                  </Button>
-                )}
-              </div>
+              ) : (
+                <Button
+                  key="submit-btn"
+                  type="submit"
+                  form="register-student-form"
+                >
+                  Submit
+                </Button>
+              )}
             </div>
-          </FormProvider>
-        </div>
+          </div>
+        </FormProvider>
       </div>
     </div>
   );
