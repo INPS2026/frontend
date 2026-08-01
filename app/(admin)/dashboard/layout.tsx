@@ -9,7 +9,10 @@ const navLinks = [
   },
   {
     label: 'Student',
-    items: [{ label: 'Register Student', path: '/dashboard/student/new' }],
+    items: [
+      { label: 'Register Student', path: '/dashboard/student/new' },
+      { label: 'All Students', path: '/dashboard/student/all' },
+    ],
   },
 ];
 

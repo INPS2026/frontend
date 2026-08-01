@@ -888,7 +888,7 @@ export default function RegisterNewStudentPage() {
     <div className="space-y-4">
       <TopBar title="Register new student" />
 
-      <div className="bg-sidebar p-4 shadow-sm">
+      <div className="bg-sidebar p-4">
         <FormProvider {...form}>
           <div className="max-w-2xl mx-auto space-y-4">
             <form
