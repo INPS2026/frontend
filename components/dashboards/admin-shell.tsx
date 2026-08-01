@@ -11,12 +11,12 @@ const navLinks = [
   {
     label: 'Student',
     items: [
+      { label: 'All Students', path: '/dashboard/students', icon: Users },
       {
         label: 'Register Student',
-        path: '/dashboard/student/new',
+        path: '/dashboard/students/new',
         icon: UserPlus,
       },
-      { label: 'All Students', path: '/dashboard/student/all', icon: Users },
     ],
   },
 ];

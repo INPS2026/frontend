@@ -1,7 +1,7 @@
 'use client';
 
 import { AppSidebar } from '../app-sidebar';
-import { LayoutDashboard, UserPlus, Users } from 'lucide-react';
+import { LayoutDashboard, Users } from 'lucide-react';
 
 const navLinks = [
   {
@@ -11,14 +11,13 @@ const navLinks = [
     ],
   },
   {
-    label: 'Student',
+    label: 'Children',
     items: [
       {
-        label: 'Register Student',
-        path: '/dashboard/student/new',
-        icon: UserPlus,
+        label: 'All Children',
+        path: '/parent/dashboard/children',
+        icon: Users,
       },
-      { label: 'All Students', path: '/dashboard/student/all', icon: Users },
     ],
   },
 ];
