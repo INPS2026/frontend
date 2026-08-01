@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -12,8 +13,9 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from './ui/sidebar';
-import { usePathname } from 'next/navigation';
-import type { LucideIcon } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { LogOut, type LucideIcon } from 'lucide-react';
+import { TokenService } from '@/lib/token-service';
 
 type AppSidebarProps = {
   links: {
@@ -24,6 +26,7 @@ type AppSidebarProps = {
 
 export const AppSidebar = ({ links }: AppSidebarProps) => {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <Sidebar collapsible="icon">
@@ -53,6 +56,19 @@ export const AppSidebar = ({ links }: AppSidebarProps) => {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenuButton
+          onClick={() => {
+            TokenService.clear();
+            router.push('/');
+          }}
+        >
+          <span>
+            <LogOut />
+          </span>
+          <span>Sign out</span>
+        </SidebarMenuButton>
+      </SidebarFooter>
     </Sidebar>
   );
 };
