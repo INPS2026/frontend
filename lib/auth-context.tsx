@@ -9,22 +9,20 @@ import {
 } from 'react';
 import { clientRequest, createBrowserApiClient } from './api-client';
 import { TokenService } from './token-service';
-import type { LoginResponse } from '@/types/auth';
+import type { LoginResponse, Staff } from '@/types/auth';
 import type { LoginPayload } from '@/components/login-form';
 
 type AuthContext = {
-  user: unknown;
+  user: Staff | null;
   login: (data: LoginPayload) => Promise<void>;
 };
-
-type User = unknown;
 
 const authContext = createContext<AuthContext | undefined>(undefined);
 
 export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const apiClient = useMemo(() => createBrowserApiClient(), []);
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Staff | null>(null);
 
   const login = async (data: LoginPayload) => {
     const res = await clientRequest<LoginResponse>(apiClient, {

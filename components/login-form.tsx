@@ -139,8 +139,8 @@ export function LoginForm({
                   {loading ? 'Logging in...' : 'Login'}
                 </Button>
                 <FieldDescription className="text-center">
-                  Sign in as <Link href="#">Teacher</Link> or{' '}
-                  <Link href="#">Parent</Link>
+                  Sign in as <Link href="/teacher/login">Teacher</Link> or{' '}
+                  <Link href="/parent/login">Parent</Link>
                 </FieldDescription>
                 {error && <FieldError errors={[{ message: error }]} />}
               </Field>
