@@ -93,7 +93,7 @@ export type Student = {
   healthInfo: string;
   sportHouse: string;
   address: string;
-  status: string;
+  status: 'ACTIVE' | 'GRADUATED' | 'WITHDRAWN';
   intakeType: 'NEW' | 'CONTINUING';
   passportPhoto: null;
   admissionDocs: null;
@@ -108,3 +108,4 @@ export type NewStudentFormInput = z.input<typeof NewStudentSchema>;
 export type NewStudentFormOutput = z.output<typeof NewStudentSchema>;
 
 export type RegisterStudentResponse = ApiResponse<Student>;
+export type GetStudentsResponse = ApiResponse<Student[]>;

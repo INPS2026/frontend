@@ -3,7 +3,7 @@
 import { Student } from '@/types/student';
 import { ColumnDef } from '@tanstack/react-table';
 
-export const studentTableColumns: ColumnDef<Student>[] = [
+export const studentColumns: ColumnDef<Student>[] = [
   {
     accessorKey: 'firstName',
     header: 'First Name',
