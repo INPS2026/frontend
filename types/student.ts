@@ -81,6 +81,7 @@ export const NewStudentSchema = z
   );
 
 export type Student = {
+  id: string;
   admissionNumber: string;
   firstName: string;
   lastName: string;
@@ -102,6 +103,7 @@ export type Student = {
   graduationDate: null;
   createdAt: string;
   updatedAt: string;
+  enrollments: Record<string, unknown>[];
 };
 
 export type NewStudentFormInput = z.input<typeof NewStudentSchema>;
@@ -109,3 +111,17 @@ export type NewStudentFormOutput = z.output<typeof NewStudentSchema>;
 
 export type RegisterStudentResponse = ApiResponse<Student>;
 export type GetStudentsResponse = ApiResponse<Student[]>;
+export type GetChildrenResponse = ApiResponse<
+  Pick<
+    Student,
+    | 'id'
+    | 'admissionNumber'
+    | 'firstName'
+    | 'lastName'
+    | 'gender'
+    | 'dateOfBirth'
+    | 'passportPhoto'
+    | 'status'
+    | 'enrollments'
+  >[]
+>;
