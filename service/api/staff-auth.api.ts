@@ -1,5 +1,5 @@
 import { clientRequest } from '@/lib/api-client';
-import { RefreshStaffTokenResponse } from '@/types/auth';
+import type { RefreshStaffTokenResponse } from '@/types/auth';
 import { adminClient } from './admin/admin-client';
 
 export const refreshStaffToken = async (refreshToken: string) => {

@@ -13,9 +13,13 @@ import {
   SidebarTrigger,
 } from './ui/sidebar';
 import { usePathname } from 'next/navigation';
+import type { LucideIcon } from 'lucide-react';
 
 type AppSidebarProps = {
-  links: { label: string; items: { label: string; path: string }[] }[];
+  links: {
+    label: string;
+    items: { label: string; path: string; icon: LucideIcon }[];
+  }[];
 };
 
 export const AppSidebar = ({ links }: AppSidebarProps) => {
@@ -37,6 +41,9 @@ export const AppSidebar = ({ links }: AppSidebarProps) => {
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton isActive={isActive}>
+                      <span>
+                        <item.icon />
+                      </span>
                       <Link href={item.path}>{item.label}</Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

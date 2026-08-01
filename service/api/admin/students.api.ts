@@ -2,7 +2,7 @@
 
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
-import {
+import type {
   GetStudentsResponse,
   NewStudentFormOutput,
   RegisterStudentResponse,

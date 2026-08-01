@@ -6,7 +6,7 @@ import type {
   AxiosResponse,
 } from 'axios';
 import { TokenService } from './token-service';
-import { ApiError } from '@/types/api';
+import type { ApiError } from '@/types/api';
 
 export function createBrowserApiClient() {
   const client = axios.create({
