@@ -10,16 +10,16 @@ const navLinks = [
       { label: 'Dashboard', path: '/parent/dashboard', icon: LayoutDashboard },
     ],
   },
-  {
-    label: 'Children',
-    items: [
-      {
-        label: 'All Children',
-        path: '/parent/dashboard/children',
-        icon: Users,
-      },
-    ],
-  },
+  // {
+  //   label: 'Children',
+  //   items: [
+  //     {
+  //       label: 'All Children',
+  //       path: '/parent/dashboard/children',
+  //       icon: Users,
+  //     },
+  //   ],
+  // },
 ];
 
 export function ParentDashboardShell({
