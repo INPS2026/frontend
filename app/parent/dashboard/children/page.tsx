@@ -2,14 +2,17 @@
 
 import { TopBar } from '@/components/top-bar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import { calcAge } from '@/lib/utils';
 import { useGetChildren } from '@/service/api/parent/children.api';
+import Link from 'next/link';
 
 export default function ParentChildrenPage() {
   const { data: childrenData } = useGetChildren();
@@ -63,6 +66,15 @@ export default function ParentChildrenPage() {
                     </div>
                   </div>
                 </CardHeader>
+                <CardFooter>
+                  <Button variant="link">
+                    <Link
+                      href={`/parent/dashboard/children/${child.id}/profile`}
+                    >
+                      View Profile
+                    </Link>
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>
