@@ -4,6 +4,7 @@ import { clientRequest } from '@/lib/api-client';
 import { parentClient } from './parent-client';
 import { useQuery } from '@tanstack/react-query';
 import { GetChildProfileResponse, GetChildrenResponse } from '@/types/student';
+import { ApiResponse } from '@/types/api';
 
 const keys = {
   all: ['parent-children'],
@@ -45,7 +46,9 @@ export const useGetChildProfile = (studentId: string) => {
 
 // Get outstanding fees for a child
 const getOutstandingFees = async (studentId: string) => {
-  return clientRequest(parentClient, {
+  return clientRequest<
+    ApiResponse<{ totalOutstanding: number; invoice: unknown[] }>
+  >(parentClient, {
     url: `/api/parent/children/${studentId}/fees`,
     method: 'GET',
   });
@@ -61,7 +64,7 @@ export const useGetOutstandingFees = (studentId: string) => {
 
 // Get payment history
 const getPaymentHistory = async (studentId: string) => {
-  return clientRequest(parentClient, {
+  return clientRequest<ApiResponse<unknown[]>>(parentClient, {
     url: `/api/parent/children/${studentId}/payments`,
     method: 'GET',
   });

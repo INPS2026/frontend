@@ -9,6 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDate } from '@/lib/utils';
 import {
@@ -16,6 +22,7 @@ import {
   useGetOutstandingFees,
   useGetPaymentHistory,
 } from '@/service/api/parent/children.api';
+import { FileText, ThumbsUp } from 'lucide-react';
 import { use } from 'react';
 
 export default function StudentProfilePage({
@@ -29,6 +36,11 @@ export default function StudentProfilePage({
   const { data: paymentHistoryData } = useGetPaymentHistory(studentId);
 
   const profile = childProfileData?.data;
+  const outstandingFees = outstandingFeesData?.data ?? {
+    totalOutstanding: 0,
+    invoice: [],
+  };
+  const paymentHistory = paymentHistoryData?.data ?? [];
 
   return (
     <div className="space-y-4">
@@ -104,7 +116,47 @@ export default function StudentProfilePage({
                 <TabsList>
                   <TabsTrigger value="finance">Finance</TabsTrigger>
                 </TabsList>
-                <TabsContent value="finance">add the fee and etc</TabsContent>
+                <TabsContent value="finance" className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Outstanding Fees</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {outstandingFees.totalOutstanding > 0 &&
+                      outstandingFees.invoice.length ? (
+                        <div>{/* TODO: render outstanding fees */}</div>
+                      ) : (
+                        <Empty>
+                          <EmptyHeader>
+                            <EmptyMedia>
+                              <ThumbsUp />
+                            </EmptyMedia>
+                            <EmptyTitle>No outstanding fees</EmptyTitle>
+                          </EmptyHeader>
+                        </Empty>
+                      )}
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Payment History</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {paymentHistory.length > 0 ? (
+                        <div>{/* TODO: render payment history */}</div>
+                      ) : (
+                        <Empty>
+                          <EmptyHeader>
+                            <EmptyMedia>
+                              <FileText />
+                            </EmptyMedia>
+                            <EmptyTitle>Nothing to show here</EmptyTitle>
+                          </EmptyHeader>
+                        </Empty>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
