@@ -7,11 +7,9 @@ import { GetChildProfileResponse, GetChildrenResponse } from '@/types/student';
 
 const keys = {
   all: ['parent-children'],
-  childProfile: (studentId: string) => [
-    ...keys.all,
-    'child-profile',
-    studentId,
-  ],
+  profile: (studentId: string) => [...keys.all, 'child-profile', studentId],
+  fees: (studentId: string) => [...keys.all, 'outstanding-fees', studentId],
+  payments: (studentId: string) => [...keys.all, 'payment-history', studentId],
 } as const;
 
 // Get all children linked to the parent
@@ -39,8 +37,40 @@ const getChildProfile = async (studentId: string) => {
 
 export const useGetChildProfile = (studentId: string) => {
   return useQuery({
-    queryKey: keys.childProfile(studentId),
-    queryFn: () => getChildProfile(studentId),
+    queryKey: keys.profile(studentId),
+    queryFn: async () => getChildProfile(studentId),
+    enabled: !!studentId,
+  });
+};
+
+// Get outstanding fees for a child
+const getOutstandingFees = async (studentId: string) => {
+  return clientRequest(parentClient, {
+    url: `/api/parent/children/${studentId}/fees`,
+    method: 'GET',
+  });
+};
+
+export const useGetOutstandingFees = (studentId: string) => {
+  return useQuery({
+    queryKey: keys.fees(studentId),
+    queryFn: async () => getOutstandingFees(studentId),
+    enabled: !!studentId,
+  });
+};
+
+// Get payment history
+const getPaymentHistory = async (studentId: string) => {
+  return clientRequest(parentClient, {
+    url: `/api/parent/children/${studentId}/payments`,
+    method: 'GET',
+  });
+};
+
+export const useGetPaymentHistory = (studentId: string) => {
+  return useQuery({
+    queryKey: keys.payments(studentId),
+    queryFn: async () => getPaymentHistory(studentId),
     enabled: !!studentId,
   });
 };

@@ -11,7 +11,11 @@ import {
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDate } from '@/lib/utils';
-import { useGetChildProfile } from '@/service/api/parent/children.api';
+import {
+  useGetChildProfile,
+  useGetOutstandingFees,
+  useGetPaymentHistory,
+} from '@/service/api/parent/children.api';
 import { use } from 'react';
 
 export default function StudentProfilePage({
@@ -21,6 +25,8 @@ export default function StudentProfilePage({
 }) {
   const { studentId } = use(params);
   const { data: childProfileData } = useGetChildProfile(studentId);
+  const { data: outstandingFeesData } = useGetOutstandingFees(studentId);
+  const { data: paymentHistoryData } = useGetPaymentHistory(studentId);
 
   const profile = childProfileData?.data;
 
