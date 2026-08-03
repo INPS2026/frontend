@@ -1,7 +1,10 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { AppSidebar } from '../app-sidebar';
 import { LayoutDashboard, UserPlus, Users } from 'lucide-react';
+import { useAuthContext } from '@/lib/auth-context';
+import { useEffect } from 'react';
 
 const navLinks = [
   {
@@ -26,6 +29,19 @@ export function AdminDashboardShell({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+  const authCtx = useAuthContext();
+
+  useEffect(() => {
+    if (!authCtx.isAuthenticated || !authCtx.user) {
+      router.push('/login');
+    }
+  }, [authCtx.isAuthenticated, authCtx.user, router]);
+
+  if (!authCtx.isAuthenticated || !authCtx.user) {
+    return null; // or a loading spinner/skeleton
+  }
+
   return (
     <>
       <AppSidebar links={navLinks} />

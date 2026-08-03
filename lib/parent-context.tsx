@@ -14,6 +14,7 @@ import type { LoginPayload } from '@/components/login-form';
 
 type ParentContext = {
   user: ParentAccount | null;
+  isAuthenticated: boolean;
   login: (data: LoginPayload) => Promise<void>;
 };
 
@@ -40,7 +41,11 @@ export const ParentContextProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
-  const value: ParentContext = { user, login };
+  const value: ParentContext = {
+    user,
+    isAuthenticated: !!TokenService.getAccessToken(),
+    login,
+  };
 
   return (
     <parentContext.Provider value={value}>{children}</parentContext.Provider>
