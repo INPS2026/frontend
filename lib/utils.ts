@@ -1,5 +1,5 @@
 import { clsx, type ClassValue } from 'clsx';
-import { differenceInCalendarYears, getHours } from 'date-fns';
+import { differenceInCalendarYears, format, getHours } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -26,4 +26,9 @@ export function getTimeOfDay(date: Date = new Date()): TimeOfDay {
   }
 
   return 'Evening';
+}
+
+// Format date - Default 'dd MMM yyyy' e.g. 15 Mar 2000
+export function formatDate(date: string, formatString?: string) {
+  return format(date, formatString ?? 'dd MMM yyyy');
 }

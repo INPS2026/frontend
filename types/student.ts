@@ -125,3 +125,4 @@ export type GetChildrenResponse = ApiResponse<
     | 'enrollments'
   >[]
 >;
+export type GetChildProfileResponse = ApiResponse<Student>;

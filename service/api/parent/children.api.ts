@@ -3,7 +3,7 @@
 import { clientRequest } from '@/lib/api-client';
 import { parentClient } from './parent-client';
 import { useQuery } from '@tanstack/react-query';
-import { GetChildrenResponse } from '@/types/student';
+import { GetChildProfileResponse, GetChildrenResponse } from '@/types/student';
 
 const keys = {
   all: ['parent-children'],
@@ -31,7 +31,7 @@ export const useGetChildren = () => {
 
 // Get a child's full profile
 const getChildProfile = async (studentId: string) => {
-  return clientRequest(parentClient, {
+  return clientRequest<GetChildProfileResponse>(parentClient, {
     url: `/api/parent/children/${studentId}`,
     method: 'GET',
   });
