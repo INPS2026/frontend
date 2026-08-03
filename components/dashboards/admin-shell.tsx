@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { AppSidebar } from '../app-sidebar';
-import { LayoutDashboard, UserPlus, Users } from 'lucide-react';
+import { LayoutDashboard, School, UserPlus, Users } from 'lucide-react';
 import { useAuthContext } from '@/lib/auth-context';
 import { useEffect } from 'react';
 
@@ -21,6 +21,10 @@ const navLinks = [
         icon: UserPlus,
       },
     ],
+  },
+  {
+    label: 'Class',
+    items: [{ label: 'All Classes', path: '/dashboard/class', icon: School }],
   },
 ];
 

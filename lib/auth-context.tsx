@@ -6,16 +6,20 @@ import {
   useContext,
   useMemo,
   useState,
+  useEffect,
 } from 'react';
 import { clientRequest, createBrowserApiClient } from './api-client';
 import { TokenService } from './token-service';
 import type { LoginResponse, Staff } from '@/types/auth';
 import type { LoginPayload } from '@/components/login-form';
 
+const USER_STORAGE_KEY = 'school_user';
+
 type AuthContext = {
   user: Staff | null;
   isAuthenticated: boolean;
   login: (data: LoginPayload) => Promise<void>;
+  logout: () => void;
 };
 
 const authContext = createContext<AuthContext | undefined>(undefined);
@@ -24,6 +28,27 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const apiClient = useMemo(() => createBrowserApiClient(), []);
 
   const [user, setUser] = useState<Staff | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Restore user from localStorage on mount
+  // Note: We need to use useEffect here to avoid hydration mismatch between server and client.
+  // The server renders with user=null, client needs to restore from localStorage after mount.
+  // Calling setState in useEffect is acceptable here to avoid hydration mismatch.
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (e) {
+          console.error('Failed to parse stored user:', e);
+          localStorage.removeItem(USER_STORAGE_KEY);
+        }
+      }
+      setIsInitialized(true);
+    }
+  }, []);
 
   const login = async (data: LoginPayload) => {
     const res = await clientRequest<LoginResponse>(apiClient, {
@@ -34,6 +59,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
     if (res.success) {
       setUser(res.user);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(res.user));
       TokenService.set({
         accessToken: res.token,
         refreshToken: res.refreshToken,
@@ -41,11 +67,23 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem(USER_STORAGE_KEY);
+    TokenService.clear();
+  };
+
   const value: AuthContext = {
     user,
     isAuthenticated: !!TokenService.getAccessToken(),
     login,
+    logout,
   };
+
+  // Don't render children until we've initialized from localStorage to avoid hydration mismatch
+  if (!isInitialized) {
+    return null;
+  }
 
   return <authContext.Provider value={value}>{children}</authContext.Provider>;
 };
