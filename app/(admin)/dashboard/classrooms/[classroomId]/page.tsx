@@ -2,6 +2,7 @@
 
 import { TopBar } from '@/components/top-bar';
 import {
+  useDeleteClassroom,
   useGetClassroomById,
   useUpdateClassroom,
 } from '@/service/api/admin/classrooms.api';
@@ -46,6 +47,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/components/ui/toast';
 import { isAxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 
 export default function ManageClassroomPage({
   params,
@@ -56,6 +58,8 @@ export default function ManageClassroomPage({
   const { data: classroomData, isLoading } = useGetClassroomById(classroomId);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const updateClassroom = useUpdateClassroom();
+  const deleteClassroom = useDeleteClassroom();
+  const router = useRouter();
 
   const form = useForm<
     Partial<NewClassroomFormInput>,
@@ -146,8 +150,25 @@ export default function ManageClassroomPage({
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
-                    onClick={() => {
-                      // call delete mutation here
+                    onClick={async () => {
+                      try {
+                        const result =
+                          await deleteClassroom.mutateAsync(classroomId);
+                        toast.add({
+                          title: 'Classroom deleted successfully',
+                        });
+                        router.push('/dashboard/classrooms');
+                      } catch (error) {
+                        if (isAxiosError(error)) {
+                          toast.add({
+                            title: 'Failed to delete classroom',
+                            description: error.message,
+                          });
+                          return;
+                        }
+                        console.log(error);
+                        toast.add({ title: 'Something went wrong' });
+                      }
                     }}
                   >
                     Delete
@@ -203,6 +224,7 @@ export default function ManageClassroomPage({
                         title: 'Failed to update classroom',
                         description: error.message,
                       });
+                      return;
                     }
                     toast.add({ title: 'Something went wrong during update' });
                   }

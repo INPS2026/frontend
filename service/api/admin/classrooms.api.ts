@@ -81,3 +81,24 @@ export const useUpdateClassroom = () => {
     },
   });
 };
+
+// Delete a class
+const deleteClassroom = async (classroomId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/classes/${classroomId}`,
+    method: 'DELETE',
+  });
+};
+
+export const useDeleteClassroom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteClassroom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: keys.all,
+      });
+    },
+  });
+};
