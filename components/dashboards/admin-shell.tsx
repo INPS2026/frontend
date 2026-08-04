@@ -23,8 +23,10 @@ const navLinks = [
     ],
   },
   {
-    label: 'Class',
-    items: [{ label: 'All Classes', path: '/dashboard/class', icon: School }],
+    label: 'Classroom',
+    items: [
+      { label: 'All Classrooms', path: '/dashboard/classrooms', icon: School },
+    ],
   },
 ];
 
