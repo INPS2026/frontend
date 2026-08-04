@@ -26,7 +26,7 @@ export function ClassRoomCard({ classRoom }: ClassRoomCardProps) {
       </CardHeader>
       <CardContent>
         <Button size="sm">
-          <Link href={`/parent/dashboard/children/${id}`}>Manage</Link>
+          <Link href={`/dashboard/classrooms/${id}`}>Manage</Link>
         </Button>
       </CardContent>
     </Card>

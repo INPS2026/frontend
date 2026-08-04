@@ -2,28 +2,24 @@
 
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
-import { useQuery } from '@tanstack/react-query';
-import type { GetAllClassroomsResponse } from '@/types/classroom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type {
+  GetAllClassroomsResponse,
+  GetClassroomByIdResponse,
+  NewClassroomFormInput,
+  UpdateClassroomResponse,
+} from '@/types/classroom';
+import { ClassroomLevel } from '@/lib/constants';
 
 type ClassFilterParams = {
-  level:
-    | 'DAYCARE'
-    | 'PRENURSERY'
-    | 'NURSERY_1'
-    | 'NURSERY_2'
-    | 'NURSERY_3'
-    | 'PRIMARY_1'
-    | 'PRIMARY_2'
-    | 'PRIMARY_3'
-    | 'PRIMARY_4'
-    | 'PRIMARY_5'
-    | 'PRIMARY_6';
+  level: ClassroomLevel;
   status: 'ACTIVE' | 'INACTIVE';
 };
 
 const keys = {
   all: ['admin-classrooms'],
   list: (params?: ClassFilterParams) => [...keys.all, 'list', params],
+  item: (classroomId: string) => [...keys.all, 'item', classroomId],
 };
 
 // Get all classes
@@ -39,5 +35,49 @@ export const useGetAllClassrooms = (params?: ClassFilterParams) => {
   return useQuery({
     queryKey: keys.list(params),
     queryFn: async () => getAllClassrooms(params),
+  });
+};
+
+// Get class by ID
+const getClassroomById = async (classroomId: string) => {
+  return clientRequest<GetClassroomByIdResponse>(adminClient, {
+    url: `/api/admin/classes/${classroomId}`,
+    method: 'GET',
+  });
+};
+
+export const useGetClassroomById = (classroomId: string) => {
+  return useQuery({
+    queryKey: keys.item(classroomId),
+    queryFn: () => getClassroomById(classroomId),
+    enabled: !!classroomId,
+  });
+};
+
+// Update a class
+const updateClassroom = async ({
+  classroomId,
+  data,
+}: {
+  classroomId: string;
+  data: Partial<NewClassroomFormInput>;
+}) => {
+  return clientRequest<UpdateClassroomResponse>(adminClient, {
+    url: `/api/admin/classes/${classroomId}`,
+    method: 'PATCH',
+    data,
+  });
+};
+
+export const useUpdateClassroom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateClassroom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: keys.all,
+      });
+    },
   });
 };
