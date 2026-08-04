@@ -35,7 +35,7 @@ import {
   NewClassroomFormOutput,
   NewClassroomSchema,
 } from '@/types/classroom';
-import { CLASSROOM_LEVELS, ClassroomLevel } from '@/lib/constants';
+import { CLASSROOM_LEVELS } from '@/lib/constants';
 import { Input } from '@/components/ui/input';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
@@ -48,6 +48,7 @@ import {
 import { toast } from '@/components/ui/toast';
 import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
+import { SectionsList } from '@/components/sections/sections-list';
 
 export default function ManageClassroomPage({
   params,
@@ -152,8 +153,7 @@ export default function ManageClassroomPage({
                   <AlertDialogAction
                     onClick={async () => {
                       try {
-                        const result =
-                          await deleteClassroom.mutateAsync(classroomId);
+                        await deleteClassroom.mutateAsync(classroomId);
                         toast.add({
                           title: 'Classroom deleted successfully',
                         });
@@ -186,7 +186,9 @@ export default function ManageClassroomPage({
               <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
               <TabsTrigger value="fee-structure">Fee Structure</TabsTrigger>
             </TabsList>
-            <TabsContent value="sections">{/* sections content */}</TabsContent>
+            <TabsContent value="sections">
+              <SectionsList sections={classroom.sections} />
+            </TabsContent>
             <TabsContent value="enrollments">
               {/* enrollments content */}
             </TabsContent>
@@ -211,7 +213,7 @@ export default function ManageClassroomPage({
               onSubmit={form.handleSubmit(
                 async (data: Partial<NewClassroomFormOutput>) => {
                   try {
-                    const result = await updateClassroom.mutateAsync({
+                    await updateClassroom.mutateAsync({
                       classroomId,
                       data,
                     });
