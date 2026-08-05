@@ -49,6 +49,7 @@ import { toast } from '@/components/ui/toast';
 import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { SectionsList } from '@/components/sections/sections-list';
+import { EnrollmentsTab } from '@/components/enrollments/enrollments-tab';
 
 export default function ManageClassroomPage({
   params,
@@ -193,7 +194,7 @@ export default function ManageClassroomPage({
               />
             </TabsContent>
             <TabsContent value="enrollments">
-              {/* enrollments content */}
+              <EnrollmentsTab classroomId={classroom.id} />
             </TabsContent>
             <TabsContent value="curriculum">
               {/* curriculum content */}

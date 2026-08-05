@@ -2,7 +2,6 @@
 
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { isAxiosError } from 'axios';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
