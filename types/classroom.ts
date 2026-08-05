@@ -1,6 +1,22 @@
 import z from 'zod';
 import { ApiResponse } from './api';
-import { CLASSROOM_LEVELS, ClassroomLevel } from '@/lib/constants';
+import { Section } from './section';
+
+export const CLASSROOM_LEVELS = [
+  'DAYCARE',
+  'PRENURSERY',
+  'NURSERY_1',
+  'NURSERY_2',
+  'NURSERY_3',
+  'PRIMARY_1',
+  'PRIMARY_2',
+  'PRIMARY_3',
+  'PRIMARY_4',
+  'PRIMARY_5',
+  'PRIMARY_6',
+] as const;
+
+export type ClassroomLevel = (typeof CLASSROOM_LEVELS)[number];
 
 export const NewClassroomSchema = z.object({
   name: z.string().min(2, 'Name is too short'),
@@ -9,24 +25,6 @@ export const NewClassroomSchema = z.object({
 
 export type NewClassroomFormInput = z.input<typeof NewClassroomSchema>;
 export type NewClassroomFormOutput = z.output<typeof NewClassroomSchema>;
-
-export type ClassroomTeacher = {
-  staffId: string;
-  firstName: string;
-  lastName: string;
-} | null;
-
-export type Section = {
-  id: string;
-  name: string;
-  classId: string;
-  color: string | null;
-  roomNumber: number | null;
-  status: 'ACTIVE' | 'INACTIVE';
-  currentEnrollment: number;
-  classTeacher: ClassroomTeacher;
-  assistantTeacher: ClassroomTeacher;
-};
 
 export type ClassRoom = {
   id: string;

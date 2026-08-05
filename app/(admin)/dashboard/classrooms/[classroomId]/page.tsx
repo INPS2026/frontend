@@ -35,7 +35,7 @@ import {
   NewClassroomFormOutput,
   NewClassroomSchema,
 } from '@/types/classroom';
-import { CLASSROOM_LEVELS } from '@/lib/constants';
+import { CLASSROOM_LEVELS } from '@/types/classroom';
 import { Input } from '@/components/ui/input';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
@@ -187,7 +187,10 @@ export default function ManageClassroomPage({
               <TabsTrigger value="fee-structure">Fee Structure</TabsTrigger>
             </TabsList>
             <TabsContent value="sections">
-              <SectionsList sections={classroom.sections} />
+              <SectionsList
+                classroomId={classroomId}
+                sections={classroom.sections}
+              />
             </TabsContent>
             <TabsContent value="enrollments">
               {/* enrollments content */}

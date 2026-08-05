@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import type { ClassroomTeacher, Section } from '@/types/classroom';
+import type { SectionTeacher, Section } from '@/types/section';
 
 type SectionCardProps = {
   section: Section;
@@ -73,7 +73,7 @@ function TeacherRow({
   teacher,
 }: {
   label: string;
-  teacher: ClassroomTeacher;
+  teacher: SectionTeacher;
 }) {
   if (!teacher) {
     return (

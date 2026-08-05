@@ -4,12 +4,12 @@ import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
+  ClassroomLevel,
   GetAllClassroomsResponse,
   GetClassroomByIdResponse,
   NewClassroomFormInput,
   UpdateClassroomResponse,
 } from '@/types/classroom';
-import { ClassroomLevel } from '@/lib/constants';
 
 type ClassFilterParams = {
   level: ClassroomLevel;
@@ -102,3 +102,5 @@ export const useDeleteClassroom = () => {
     },
   });
 };
+
+export { keys as classroomKeys };
