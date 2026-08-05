@@ -1,4 +1,5 @@
-// components/sections/section-card.tsx
+'use client';
+
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -57,15 +58,11 @@ export function SectionCard({ section }: SectionCardProps) {
           <TeacherRow label="Assistant Teacher" teacher={assistantTeacher} />
         </div>
 
-        <Button
-          size="sm"
-          className="w-full"
-          render={
-            <Link href={`/dashboard/classrooms/${classId}/sections/${id}`}>
-              Manage
-            </Link>
-          }
-        />
+        <Button size="sm" className="w-full">
+          <Link href={`/dashboard/classrooms/${classId}/sections/${id}`}>
+            Manage
+          </Link>
+        </Button>
       </CardContent>
     </Card>
   );

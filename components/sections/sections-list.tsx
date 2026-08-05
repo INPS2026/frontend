@@ -1,4 +1,5 @@
-// components/sections/sections-list.tsx
+'use client';
+
 import { SectionCard } from './section-card';
 import type { Section } from '@/types/classroom';
 
