@@ -24,6 +24,17 @@ type AppSidebarProps = {
   }[];
 };
 
+function matchesNavHref(pathname: string, href: string) {
+  if (href === '/dashboard') return pathname === '/dashboard';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function getActiveNavHref(pathname: string, hrefs: string[]) {
+  const matches = hrefs.filter((href) => matchesNavHref(pathname, href));
+  if (matches.length === 0) return undefined;
+  return matches.sort((a, b) => b.length - a.length)[0];
+}
+
 export const AppSidebar = ({ links }: AppSidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
@@ -34,27 +45,32 @@ export const AppSidebar = ({ links }: AppSidebarProps) => {
         <SidebarTrigger />
       </SidebarHeader>
       <SidebarContent>
-        {links.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            <SidebarMenu>
-              {group.items.map((item) => {
-                const isActive = pathname === item.path;
+        {links.map((group) => {
+          const hrefs = group.items.map((i) => i.path);
+          const activeHref = getActiveNavHref(pathname ?? '/', hrefs);
 
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton isActive={isActive}>
-                      <span>
-                        <item.icon />
-                      </span>
-                      <Link href={item.path}>{item.label}</Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
+          return (
+            <SidebarGroup key={group.label}>
+              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const isActive = activeHref === item.path;
+
+                  return (
+                    <SidebarMenuItem key={item.path}>
+                      <SidebarMenuButton isActive={isActive}>
+                        <span>
+                          <item.icon />
+                        </span>
+                        <Link href={item.path}>{item.label}</Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroup>
+          );
+        })}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenuButton
