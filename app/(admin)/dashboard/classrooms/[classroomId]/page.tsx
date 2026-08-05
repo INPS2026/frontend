@@ -50,6 +50,7 @@ import { isAxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { SectionsList } from '@/components/sections/sections-list';
 import { EnrollmentsTab } from '@/components/enrollments/enrollments-tab';
+import { CurriculumTab } from '@/components/curriculum/curriculum-tab';
 
 export default function ManageClassroomPage({
   params,
@@ -197,7 +198,7 @@ export default function ManageClassroomPage({
               <EnrollmentsTab classroomId={classroom.id} />
             </TabsContent>
             <TabsContent value="curriculum">
-              {/* curriculum content */}
+              <CurriculumTab classroomId={classroom.id} />
             </TabsContent>
             <TabsContent value="fee-structure">
               {/* fee structure content */}

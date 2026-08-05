@@ -3,7 +3,7 @@
 import { TopBar } from '@/components/top-bar';
 import { DataTable } from '@/components/ui/data-table';
 import { PaginationControls } from '@/components/ui/pagination-controls';
-import { studentColumns } from '@/lib/columns/student';
+import { studentColumns } from '@/lib/columns/student-columns';
 import { useGetStudents } from '@/service/api/admin/students.api';
 import { useState } from 'react';
 
