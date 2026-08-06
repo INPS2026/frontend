@@ -2,8 +2,12 @@
 
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
-import { useQuery } from '@tanstack/react-query';
-import { GetSubjectsAssignedToClassroomResponse } from '@/types/curriculum';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  AssignMultipleSubjectsToClassResponse,
+  AssignSingleSubjectResponse,
+  GetSubjectsAssignedToClassroomResponse,
+} from '@/types/curriculum';
 
 const keys = {
   all: ['admin-curriculum'] as const,
@@ -31,5 +35,59 @@ export const useGetSubjectsAssignedToClassroom = (
     queryKey: keys.list(classroomId, termId),
     queryFn: async () => getSubjectsAssignedToClassroom(classroomId, termId),
     enabled: !!classroomId && !!termId,
+  });
+};
+
+// Assign single subject to class
+const assignSingleSubject = async ({
+  classroomId,
+  subjectId,
+  data,
+}: {
+  classroomId: string;
+  subjectId: string;
+  data: { termId: string };
+}) => {
+  return clientRequest<AssignSingleSubjectResponse>(adminClient, {
+    url: `/api/admin/subjects/classes/${classroomId}/subjects/${subjectId}`,
+    method: 'POST',
+    data,
+  });
+};
+
+export const useAssignSingleSubject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: assignSingleSubject,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: [variables.classroomId] });
+    },
+  });
+};
+
+// Assign multiple subjects to a class for a term
+const assignMultipleSubjects = async ({
+  classroomId,
+  data,
+}: {
+  classroomId: string;
+  data: { termId: string; subjectIds: string[] };
+}) => {
+  return clientRequest<AssignMultipleSubjectsToClassResponse>(adminClient, {
+    url: `/api/admin/subjects/classes/${classroomId}/subjects/bulk`,
+    method: 'POST',
+    data,
+  });
+};
+
+export const useAssignMultipleSubjects = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: assignMultipleSubjects,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: [variables.classroomId] });
+    },
   });
 };

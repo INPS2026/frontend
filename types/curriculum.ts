@@ -10,3 +10,22 @@ export type GetSubjectsAssignedToClassroomResponse = ApiResponse<
     termId: string;
   }[]
 >;
+
+export type AssignSingleSubjectResponse = ApiResponse<{
+  id: string;
+  classId: string;
+  subjectId: string;
+  termId: string;
+}>;
+
+export type AssignMultipleSubjectsToClassResponse = ApiResponse<{
+  added: number;
+  skipped: number;
+  curriculum: {
+    id: string;
+    subject: {
+      subjectName: string;
+      subjectCode: string;
+    };
+  }[];
+}>;
