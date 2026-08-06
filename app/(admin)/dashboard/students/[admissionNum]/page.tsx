@@ -38,22 +38,24 @@ export default function StudentProfilePage({
             onUpdate={() => setIsUpdateModalOpen(true)}
           />
         </div>
-        <Tabs defaultValue="enrollments">
-          <TabsList>
-            <TabsTrigger value="enrollments">Enrollments</TabsTrigger>
-            <TabsTrigger value="results">Results</TabsTrigger>
-            <TabsTrigger value="subjects">Subjects</TabsTrigger>
-          </TabsList>
-          <TabsContent value="enrollments">
-            <EnrollmentsTab admissionNumber={admissionNum} />
-          </TabsContent>
-          <TabsContent value="results">
-            <ResultsTab admissionNumber={admissionNum} />
-          </TabsContent>
-          <TabsContent value="subjects">
-            <SubjectsTab admissionNumber={admissionNum} />
-          </TabsContent>
-        </Tabs>
+        <div className="p-4 bg-sidebar rounded-lg">
+          <Tabs defaultValue="enrollments">
+            <TabsList>
+              <TabsTrigger value="enrollments">Enrollments</TabsTrigger>
+              <TabsTrigger value="results">Results</TabsTrigger>
+              <TabsTrigger value="subjects">Subjects</TabsTrigger>
+            </TabsList>
+            <TabsContent value="enrollments">
+              <EnrollmentsTab admissionNumber={admissionNum} />
+            </TabsContent>
+            <TabsContent value="results">
+              <ResultsTab admissionNumber={admissionNum} />
+            </TabsContent>
+            <TabsContent value="subjects">
+              <SubjectsTab admissionNumber={admissionNum} />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
 
       {student && (

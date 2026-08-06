@@ -13,6 +13,8 @@ const keys = {
   lists: () => [...keys.all, 'list'] as const,
   list: (id: string, params: unknown) =>
     [...keys.lists(), { id, params }] as const,
+  details: () => [...keys.all, 'detail'] as const,
+  detail: (id: string) => [...keys.details(), id],
 };
 
 // Get all enrollments for a class
@@ -35,5 +37,21 @@ export const useGetEnrollmentsForClassroom = (
     queryKey: keys.list(classroomId, params),
     queryFn: async () => getEnrollmentsForClassroom(classroomId, params),
     enabled: !!classroomId,
+  });
+};
+
+// Get students active enrollment
+const getActiveEnrollment = async (studentId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/enrollment/student/${studentId}`,
+    method: 'GET',
+  });
+};
+
+export const useGetActiveEnrollment = (studentId: string) => {
+  useQuery({
+    queryKey: keys.detail(studentId),
+    queryFn: async () => getActiveEnrollment(studentId),
+    enabled: !!studentId,
   });
 };
