@@ -1,12 +1,19 @@
 'use client';
 
 import {
+  StudentForm,
+  mapStudentToFormValues,
+} from '@/components/students/student-form';
+import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import type { GetStudentByAdmissionNoResponse } from '@/types/student';
+import type {
+  GetStudentByAdmissionNoResponse,
+  NewStudentFormOutput,
+} from '@/types/student';
 
 type Student = Awaited<GetStudentByAdmissionNoResponse>['data'];
 
@@ -21,13 +28,25 @@ export function UpdateStudentModal({
   open,
   onOpenChange,
 }: UpdateStudentModalProps) {
+  const handleSubmit = async (
+    _data: NewStudentFormOutput,
+    changedValues?: Partial<NewStudentFormOutput>,
+  ) => {
+    console.log('Changed student values:', changedValues ?? {});
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Student</DialogTitle>
         </DialogHeader>
-        {/* TODO: form fields prefilled from `student`, submit handler */}
+        <StudentForm
+          mode="update"
+          initialValues={mapStudentToFormValues(student)}
+          onSubmit={handleSubmit}
+        />
       </DialogContent>
     </Dialog>
   );
