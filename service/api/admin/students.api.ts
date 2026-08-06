@@ -142,3 +142,25 @@ export const useUpdateStudentRecord = () => {
     },
   });
 };
+
+// Delete student record
+const deleteStudentRecord = async (admissionNum: string) => {
+  return clientRequest<Promise<{ success: boolean; message: string }>>(
+    adminClient,
+    {
+      url: `/api/admin/students/${admissionNum}`,
+      method: 'DELETE',
+    },
+  );
+};
+
+export const useDeleteStudentRecord = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteStudentRecord,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.all });
+    },
+  });
+};

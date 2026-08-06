@@ -127,7 +127,7 @@ export function StudentHeader({ student, onUpdate }: StudentHeaderProps) {
         <DeleteStudentDialog
           admissionNumber={student.admissionNumber}
           studentName={fullName}
-          onSuccess={() => router.push('/admin/students')}
+          onSuccess={() => router.push('/dashboard/students')}
         />
       </div>
     </div>

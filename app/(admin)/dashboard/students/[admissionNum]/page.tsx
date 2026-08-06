@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import { use } from 'react';
 import { TopBar } from '@/components/top-bar';
-import { useGetStudentByAdmissionNo } from '@/service/api/admin/students.api';
+import {
+  useDeleteStudentRecord,
+  useGetStudentByAdmissionNo,
+} from '@/service/api/admin/students.api';
 import { StudentHeader } from '@/components/students/student-header';
 import { UpdateStudentModal } from '@/components/students/update-student-modal';
 import { EnrollmentsTab } from '@/components/students/enrollments-tab';
@@ -26,10 +29,6 @@ export default function StudentProfilePage({
   const student = studentData?.data;
 
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-
-  const handleDelete = () => {
-    // TODO: call delete mutation, handle confirmation, redirect on success
-  };
 
   if (isPending || isLoading) {
     return (

@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useDeleteStudentRecord } from '@/service/api/admin/students.api';
 
 interface DeleteStudentDialogProps {
   admissionNumber: string;
@@ -32,11 +33,12 @@ export function DeleteStudentDialog({
 }: DeleteStudentDialogProps) {
   const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const deleteStudentRecord = useDeleteStudentRecord();
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      // TODO: call delete mutation with admissionNumber
+      await deleteStudentRecord.mutateAsync(admissionNumber);
       setOpen(false);
       onSuccess?.();
     } finally {

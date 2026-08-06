@@ -1,5 +1,6 @@
 'use client';
 
+import { DeleteStudentDialog } from '@/components/students/delete-student-dialog';
 import { Button } from '@/components/ui/button';
 import type { Student } from '@/types/student';
 import { ColumnDef } from '@tanstack/react-table';
@@ -27,6 +28,7 @@ export const studentColumns: ColumnDef<Student>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const student = row.original;
+      const fullName = `${student.firstName} ${student.lastName}`;
 
       return (
         <div className="space-x-2">
@@ -35,10 +37,10 @@ export const studentColumns: ColumnDef<Student>[] = [
               View Profile
             </Link>
           </Button>
-          <Button size="sm" variant="destructive">
-            <Trash />
-            Delete
-          </Button>
+          <DeleteStudentDialog
+            admissionNumber={student.admissionNumber}
+            studentName={fullName}
+          />
         </div>
       );
     },
