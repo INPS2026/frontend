@@ -138,3 +138,4 @@ export type GetChildrenResponse = ApiResponse<
 >;
 export type GetChildProfileResponse = ApiResponse<Student>;
 export type GetStudentByAdmissionNoResponse = ApiResponse<Student>;
+export type UpdateStudentRecordResponse = ApiResponse<Student>;

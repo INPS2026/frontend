@@ -10,10 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useUpdateStudentRecord } from '@/service/api/admin/students.api';
 import type {
   GetStudentByAdmissionNoResponse,
   NewStudentFormOutput,
 } from '@/types/student';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 type Student = Awaited<GetStudentByAdmissionNoResponse>['data'];
 
@@ -28,12 +31,33 @@ export function UpdateStudentModal({
   open,
   onOpenChange,
 }: UpdateStudentModalProps) {
+  const updateStudentRecord = useUpdateStudentRecord();
+
   const handleSubmit = async (
     _data: NewStudentFormOutput,
     changedValues?: Partial<NewStudentFormOutput>,
   ) => {
-    console.log('Changed student values:', changedValues ?? {});
-    onOpenChange(false);
+    try {
+      const res = await updateStudentRecord.mutateAsync({
+        admissionNum: student.admissionNumber,
+        data: changedValues ?? {},
+      });
+      toast.add({
+        title: 'Update successful',
+        description: res.message,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to update record',
+          description: error.message,
+        });
+      }
+      toast.add({
+        title: 'Something went wrong',
+      });
+    }
   };
 
   return (

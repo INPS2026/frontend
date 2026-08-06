@@ -134,12 +134,24 @@ export const createStudentFormDefaults = (): NewStudentFormInput => ({
   },
 });
 
+const formatDateValue = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value.slice(0, 10);
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString().slice(0, 10);
+  }
+
+  return '';
+};
+
 export const mapStudentToFormValues = (
   student: Student,
 ): NewStudentFormInput => ({
   firstName: student.firstName ?? '',
   lastName: student.lastName ?? '',
-  dateOfBirth: student.dateOfBirth ? student.dateOfBirth.slice(0, 10) : '',
+  dateOfBirth: formatDateValue(student.dateOfBirth),
   gender: student.gender ?? 'MALE',
   nationality: student.nationality ?? '',
   state: student.state ?? '',
@@ -147,12 +159,8 @@ export const mapStudentToFormValues = (
   religion: (student.religion as NewStudentFormInput['religion']) ?? 'other',
   address: student.address ?? '',
   intakeType: student.intakeType ?? 'NEW',
-  admissionDate: student.admissionDate
-    ? student.admissionDate.slice(0, 10)
-    : '',
-  graduationDate: student.graduationDate
-    ? student.graduationDate.slice(0, 10)
-    : '',
+  admissionDate: formatDateValue(student.admissionDate),
+  graduationDate: formatDateValue(student.graduationDate),
   sportHouse: student.sportHouse ?? '',
   healthInfo: student.healthInfo ?? '',
   accountEmail: student.parent?.accountEmail ?? '',

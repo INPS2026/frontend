@@ -8,6 +8,7 @@ import type {
   NewStudentFormOutput,
   RegisterStudentResponse,
   Student,
+  UpdateStudentRecordResponse,
 } from '@/types/student';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -94,5 +95,31 @@ export const useGetStudentByAdmissionNo = (admissionNo: string) => {
     queryKey: keys.detail(admissionNo),
     queryFn: async () => getStudentByAdmissionNo(admissionNo),
     enabled: !!admissionNo,
+  });
+};
+
+// Update student record
+const updateStudentRecord = async ({
+  admissionNum,
+  data,
+}: {
+  admissionNum: string;
+  data: Partial<NewStudentFormOutput>;
+}) => {
+  return clientRequest<UpdateStudentRecordResponse>(adminClient, {
+    url: `/api/admin/students/${admissionNum}`,
+    method: 'PATCH',
+    data,
+  });
+};
+
+export const useUpdateStudentRecord = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateStudentRecord,
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: [variables.admissionNum] });
+    },
   });
 };
