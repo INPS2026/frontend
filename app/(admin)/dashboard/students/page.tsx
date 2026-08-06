@@ -12,11 +12,24 @@ export default function AllStudentPage() {
     page: 1,
     limit: 20,
   });
-  const { data: studentsData, isPending } = useGetStudents(pagination);
+  const {
+    data: studentsData,
+    isPending,
+    isLoading,
+  } = useGetStudents(pagination);
 
   const students = studentsData?.data ?? [];
   const page = studentsData?.meta?.page ?? pagination.page;
   const totalPages = studentsData?.meta?.totalPages ?? 1;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <TopBar title="All Students" subtitle="View and manage all students" />
+        <div className="p-4 bg-sidebar">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

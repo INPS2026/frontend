@@ -6,7 +6,7 @@ import { GetActiveTermResponse } from '@/types/term';
 const keys = {
   all: ['admin-terms'] as const,
   lists: () => [...keys.all, 'list'] as const,
-  details: () => [keys.all, 'detail'] as const,
+  details: () => [...keys.all, 'detail'] as const,
 };
 
 // Get current active term

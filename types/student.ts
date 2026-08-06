@@ -1,6 +1,15 @@
 import z from 'zod';
 import { ApiResponse } from './api';
 
+export const STUDENT_SEX = ['MALE', 'FEMALE'] as const;
+export type StudentSex = (typeof STUDENT_SEX)[number];
+
+export const STUDENT_STATUS = ['ACTIVE', 'GRADUATED', 'WITHDRAWN'] as const;
+export type StudentStatus = (typeof STUDENT_STATUS)[number];
+
+export const INTAKE_TYPE = ['NEW', 'CONTINUING'] as const;
+export type IntakeType = (typeof INTAKE_TYPE)[number];
+
 const dateField = (message: string) =>
   z
     .string()
@@ -12,7 +21,7 @@ export const NewStudentSchema = z
   .object({
     firstName: z.string().min(3, 'First name is too short'),
     lastName: z.string().min(3, 'Last name is too short'),
-    gender: z.enum(['MALE', 'FEMALE']),
+    gender: z.enum(STUDENT_SEX),
     dateOfBirth: dateField('Date of birth is required'),
     nationality: z.string().min(3, 'Nationality is too short'),
     state: z.string().min(3, 'State is too short'),
@@ -21,7 +30,7 @@ export const NewStudentSchema = z
     healthInfo: z.string().min(3, 'Health information is too short'),
     sportHouse: z.string().min(3, 'Sport house is too short'),
     address: z.string().min(3, 'Address is too short'),
-    intakeType: z.enum(['NEW', 'CONTINUING'], 'Intake type too short'),
+    intakeType: z.enum(INTAKE_TYPE, 'Intake type too short'),
     admissionDate: dateField('Admission date is required'),
     graduationDate: z
       .string()
@@ -85,7 +94,7 @@ export type Student = {
   admissionNumber: string;
   firstName: string;
   lastName: string;
-  gender: 'MALE' | 'FEMALE';
+  gender: StudentSex;
   dateOfBirth: string;
   nationality: string;
   state: string;
@@ -94,8 +103,8 @@ export type Student = {
   healthInfo: string;
   sportHouse: string;
   address: string;
-  status: 'ACTIVE' | 'GRADUATED' | 'WITHDRAWN';
-  intakeType: 'NEW' | 'CONTINUING';
+  status: StudentStatus;
+  intakeType: IntakeType;
   passportPhoto: null;
   admissionDocs: null;
   biometricId: null;
@@ -126,3 +135,14 @@ export type GetChildrenResponse = ApiResponse<
   >[]
 >;
 export type GetChildProfileResponse = ApiResponse<Student>;
+export type GetStudentByAdmissionNoResponse = ApiResponse<{
+  admissionNumber: string;
+  firstName: string;
+  lastName: string;
+  gender: StudentSex;
+  status: StudentStatus;
+  parent: {
+    accountEmail: string;
+    accountPhone: string;
+  };
+}>;

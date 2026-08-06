@@ -3,6 +3,7 @@
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
 import type {
+  GetStudentByAdmissionNoResponse,
   GetStudentsResponse,
   NewStudentFormOutput,
   RegisterStudentResponse,
@@ -17,13 +18,12 @@ interface GetStudentParams {
 }
 
 const keys = {
-  all: ['admin-students'],
-  students: (params?: GetStudentParams) => [
-    ...keys.all,
-    'students-list',
-    params,
-  ],
-} as const;
+  all: ['admin-students'] as const,
+  lists: () => [...keys.all, 'list'] as const,
+  list: (params: unknown) => [...keys.lists(), { params }] as const,
+  details: () => [...keys.all, 'detail'] as const,
+  detail: (id: string) => [...keys.details(), id],
+};
 
 // Register new student
 const registerStudent = async (
@@ -76,7 +76,23 @@ const getStudents = async (params?: GetStudentParams): GetStudentsResponse => {
 
 export const useGetStudents = (params?: GetStudentParams) => {
   return useQuery({
-    queryKey: keys.students(params),
+    queryKey: keys.list(params),
     queryFn: async () => getStudents(params),
+  });
+};
+
+// Get a student by admission number
+const getStudentByAdmissionNo = async (admissionNo: string) => {
+  return clientRequest<GetStudentByAdmissionNoResponse>(adminClient, {
+    url: `/api/admin/students/${admissionNo}`,
+    method: 'GET',
+  });
+};
+
+export const useGetStudentByAdmissionNo = (admissionNo: string) => {
+  return useQuery({
+    queryKey: keys.detail(admissionNo),
+    queryFn: async () => getStudentByAdmissionNo(admissionNo),
+    enabled: !!admissionNo,
   });
 };

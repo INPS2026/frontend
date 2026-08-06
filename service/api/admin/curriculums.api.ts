@@ -12,7 +12,7 @@ import {
 const keys = {
   all: ['admin-curriculum'] as const,
   lists: () => [...keys.all, 'list'] as const,
-  list: (id: string, params?: unknown) => [keys.lists(), id, { params }],
+  list: (id: string, params?: unknown) => [...keys.lists(), id, { params }],
 };
 
 // Get all subjects assigned to a class for term
