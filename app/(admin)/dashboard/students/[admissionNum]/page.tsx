@@ -31,30 +31,30 @@ export default function StudentProfilePage({
     <div className="space-y-4">
       <TopBar title="Student Profile" subtitle="Manage student activities" />
 
-      <div className="p-4 bg-sidebar rounded-lg">
-        <StudentHeader
-          student={student}
-          onUpdate={() => setIsUpdateModalOpen(true)}
-        />
+      <div className="px-4 space-y-4">
+        <div className="p-4 bg-sidebar rounded-lg">
+          <StudentHeader
+            student={student}
+            onUpdate={() => setIsUpdateModalOpen(true)}
+          />
+        </div>
+        <Tabs defaultValue="enrollments">
+          <TabsList>
+            <TabsTrigger value="enrollments">Enrollments</TabsTrigger>
+            <TabsTrigger value="results">Results</TabsTrigger>
+            <TabsTrigger value="subjects">Subjects</TabsTrigger>
+          </TabsList>
+          <TabsContent value="enrollments">
+            <EnrollmentsTab admissionNumber={admissionNum} />
+          </TabsContent>
+          <TabsContent value="results">
+            <ResultsTab admissionNumber={admissionNum} />
+          </TabsContent>
+          <TabsContent value="subjects">
+            <SubjectsTab admissionNumber={admissionNum} />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <Tabs defaultValue="enrollments">
-        <TabsList>
-          <TabsTrigger value="enrollments">Enrollments</TabsTrigger>
-          <TabsTrigger value="results">Results</TabsTrigger>
-          <TabsTrigger value="subjects">Subjects</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="enrollments">
-          <EnrollmentsTab admissionNumber={admissionNum} />
-        </TabsContent>
-        <TabsContent value="results">
-          <ResultsTab admissionNumber={admissionNum} />
-        </TabsContent>
-        <TabsContent value="subjects">
-          <SubjectsTab admissionNumber={admissionNum} />
-        </TabsContent>
-      </Tabs>
 
       {student && (
         <UpdateStudentModal

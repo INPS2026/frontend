@@ -1,5 +1,6 @@
 import z from 'zod';
 import { ApiResponse } from './api';
+import { ParentAccount } from './auth';
 
 export const STUDENT_SEX = ['MALE', 'FEMALE'] as const;
 export type StudentSex = (typeof STUDENT_SEX)[number];
@@ -113,6 +114,7 @@ export type Student = {
   createdAt: string;
   updatedAt: string;
   enrollments: Record<string, unknown>[];
+  parent: ParentAccount;
 };
 
 export type NewStudentFormInput = z.input<typeof NewStudentSchema>;
@@ -135,14 +137,4 @@ export type GetChildrenResponse = ApiResponse<
   >[]
 >;
 export type GetChildProfileResponse = ApiResponse<Student>;
-export type GetStudentByAdmissionNoResponse = ApiResponse<{
-  admissionNumber: string;
-  firstName: string;
-  lastName: string;
-  gender: StudentSex;
-  status: StudentStatus;
-  parent: {
-    accountEmail: string;
-    accountPhone: string;
-  };
-}>;
+export type GetStudentByAdmissionNoResponse = ApiResponse<Student>;
