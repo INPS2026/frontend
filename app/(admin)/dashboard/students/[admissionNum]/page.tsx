@@ -17,7 +17,11 @@ export default function StudentProfilePage({
   params: Promise<{ admissionNum: string }>;
 }) {
   const { admissionNum } = use(params);
-  const { data: studentData } = useGetStudentByAdmissionNo(admissionNum);
+  const {
+    data: studentData,
+    isPending,
+    isLoading,
+  } = useGetStudentByAdmissionNo(admissionNum);
 
   const student = studentData?.data;
 
@@ -26,6 +30,15 @@ export default function StudentProfilePage({
   const handleDelete = () => {
     // TODO: call delete mutation, handle confirmation, redirect on success
   };
+
+  if (isPending || isLoading) {
+    return (
+      <div className="space-y-4">
+        <TopBar title="Student Profile" subtitle="Manage student activities" />
+        <div className="p-4">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

@@ -30,7 +30,10 @@ export function StudentHeader({ student, onUpdate }: StudentHeaderProps) {
   const fullName = `${student.firstName} ${student.lastName}`;
   const initials =
     `${student.firstName[0] ?? ''}${student.lastName[0] ?? ''}`.toUpperCase();
-  const { parent } = student;
+  const parent = student.parent;
+  const parentSummary = parent
+    ? `${parent.accountEmail ?? 'No email'} · ${parent.accountPhone ?? 'No phone'}`
+    : 'Parent details unavailable';
 
   return (
     <div className="flex items-start justify-between gap-4">
@@ -73,44 +76,46 @@ export function StudentHeader({ student, onUpdate }: StudentHeaderProps) {
                   type="button"
                   className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
                 >
-                  Parent: {parent.accountEmail} &middot; {parent.accountPhone}
+                  Parent: {parentSummary}
                 </button>
               }
             />
-            <HoverCardContent className="w-80 space-y-3">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">
-                  Father
-                </p>
-                <p className="text-sm">
-                  {parent.fatherFirstName} {parent.fatherLastName} &middot;{' '}
-                  {parent.fatherOccupation}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {parent.fatherEmail} &middot; {parent.fatherPhone}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">
-                  Mother
-                </p>
-                <p className="text-sm">
-                  {parent.motherFirstName} {parent.motherLastName} &middot;{' '}
-                  {parent.motherOccupation}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {parent.motherEmail} &middot; {parent.motherPhone}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">
-                  Household
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {parent.address} &middot; {parent.maritalStatus}
-                </p>
-              </div>
-            </HoverCardContent>
+            {parent && (
+              <HoverCardContent className="w-80 space-y-3">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Father
+                  </p>
+                  <p className="text-sm">
+                    {parent.fatherFirstName} {parent.fatherLastName} &middot;{' '}
+                    {parent.fatherOccupation}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {parent.fatherEmail} &middot; {parent.fatherPhone}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Mother
+                  </p>
+                  <p className="text-sm">
+                    {parent.motherFirstName} {parent.motherLastName} &middot;{' '}
+                    {parent.motherOccupation}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {parent.motherEmail} &middot; {parent.motherPhone}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Household
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {parent.address} &middot; {parent.maritalStatus}
+                  </p>
+                </div>
+              </HoverCardContent>
+            )}
           </HoverCard>
         </div>
       </div>

@@ -1000,7 +1000,6 @@ export function StudentForm({
         ...(initialValues ?? {}),
       });
 
-      console.log('Changed student values:', changedValues);
       await onSubmit?.(data, changedValues);
       return;
     }

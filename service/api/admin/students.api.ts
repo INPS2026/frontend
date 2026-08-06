@@ -118,8 +118,27 @@ export const useUpdateStudentRecord = () => {
 
   return useMutation({
     mutationFn: updateStudentRecord,
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [variables.admissionNum] });
+    onSuccess: (response, variables) => {
+      queryClient.setQueryData<GetStudentByAdmissionNoResponse | undefined>(
+        keys.detail(variables.admissionNum),
+        (current) => {
+          if (!current) {
+            return current;
+          }
+
+          return {
+            ...current,
+            data: response.data,
+          };
+        },
+      );
+
+      queryClient.invalidateQueries({
+        queryKey: keys.detail(variables.admissionNum),
+      });
+      queryClient.invalidateQueries({
+        queryKey: keys.all,
+      });
     },
   });
 };
