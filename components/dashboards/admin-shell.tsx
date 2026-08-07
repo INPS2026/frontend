@@ -28,6 +28,10 @@ const navLinks = [
       { label: 'All Classrooms', path: '/dashboard/classrooms', icon: School },
     ],
   },
+  {
+    label: 'Staff',
+    items: [{ label: 'All Staffs', path: '/dashboard/staffs', icon: Users }],
+  },
 ];
 
 export function AdminDashboardShell({
