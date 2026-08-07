@@ -3,10 +3,7 @@
 import { useState } from 'react';
 import { use } from 'react';
 import { TopBar } from '@/components/top-bar';
-import {
-  useDeleteStudentRecord,
-  useGetStudentByAdmissionNo,
-} from '@/service/api/admin/students.api';
+import { useGetStudentByAdmissionNo } from '@/service/api/admin/students.api';
 import { StudentHeader } from '@/components/students/student-header';
 import { UpdateStudentModal } from '@/components/students/update-student-modal';
 import { EnrollmentsTab } from '@/components/students/enrollments-tab';

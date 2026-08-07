@@ -7,7 +7,7 @@ export type TermStatus = 'CURRENT';
 
 export type GetActiveTermResponse = ApiResponse<{
   id: string;
-  term: string;
+  term: Term;
   status: TermStatus;
   startDate: string;
   endDate: string;

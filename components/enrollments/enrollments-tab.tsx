@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Field, FieldLabel } from '@/components/ui/field';
+import { getAcademicYearOptions } from '@/lib/academic-year';
 
 type EnrollmentsTabProps = {
   classroomId: string;
@@ -27,26 +28,8 @@ const STATUS_OPTIONS: (EnrollmentStatus | 'ALL')[] = [
   'COMPLETED',
 ];
 
-// function getAcademicYearOptions() {
-//   const currentYear = new Date().getFullYear();
-//   const years: string[] = [];
-//   for (let offset = -2; offset <= 1; offset++) {
-//     const start = currentYear + offset;
-//     years.push(`${start}/${start + 1}`);
-//   }
-//   return years;
-// }
-
 export function EnrollmentsTab({ classroomId }: EnrollmentsTabProps) {
-  const academicYearOptions = useMemo(function getAcademicYearOptions() {
-    const currentYear = new Date().getFullYear();
-    const years: string[] = [];
-    for (let offset = -2; offset <= 1; offset++) {
-      const start = currentYear + offset;
-      years.push(`${start}/${start + 1}`);
-    }
-    return years;
-  }, []);
+  const academicYearOptions = useMemo(() => getAcademicYearOptions(), []);
 
   const [params, setParams] = useState<GetEnrollmentsForClassroomParams>({
     academicYear: '2024/2025',

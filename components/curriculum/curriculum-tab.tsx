@@ -6,6 +6,7 @@ import { useGetSubjectsAssignedToClassroom } from '@/service/api/admin/curriculu
 import { useGetActiveTerm } from '@/service/api/admin/terms.api';
 import { Badge } from '@/components/ui/badge';
 import { subjectColumns } from '@/lib/columns/subject-columns';
+import { formatTerm } from '@/lib/format';
 
 type CurriculumTabProps = {
   classroomId: string;
@@ -47,13 +48,6 @@ export function CurriculumTab({ classroomId }: CurriculumTabProps) {
       )}
     </div>
   );
-}
-
-function formatTerm(term: string) {
-  return term
-    .split('_')
-    .map((word) => word[0] + word.slice(1).toLowerCase())
-    .join(' ');
 }
 
 function formatDateRange(startDate: string, endDate: string) {

@@ -4,7 +4,6 @@ import { DeleteStudentDialog } from '@/components/students/delete-student-dialog
 import { Button } from '@/components/ui/button';
 import type { Student } from '@/types/student';
 import { ColumnDef } from '@tanstack/react-table';
-import { Trash } from 'lucide-react';
 import Link from 'next/link';
 
 export const studentColumns: ColumnDef<Student>[] = [

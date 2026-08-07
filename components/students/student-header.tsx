@@ -11,7 +11,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '../ui/hover-card';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/format';
 
 type Student = Awaited<GetStudentByAdmissionNoResponse>['data'];
 
