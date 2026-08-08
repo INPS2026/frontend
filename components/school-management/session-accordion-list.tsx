@@ -28,7 +28,7 @@ export function SessionAccordionList({ sessions }: { sessions: Session[] }) {
   }
 
   return (
-    <Accordion className="w-full space-y-2">
+    <Accordion className="w-full space-y-2 bg-sidebar">
       {sessions.map((session) => (
         <AccordionItem
           key={session.id}

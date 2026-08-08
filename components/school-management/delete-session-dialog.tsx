@@ -13,6 +13,10 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import type { GetAllAcademicSessionsResponse } from '@/types/config';
+import { useDeleteAcademicSession } from '@/service/api/admin/config.api';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
+import { Button } from '../ui/button';
 
 type Session = Awaited<GetAllAcademicSessionsResponse>['data'][number];
 
@@ -26,13 +30,24 @@ export function DeleteSessionDialog({
   onSuccess?: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const deleteSession = useDeleteAcademicSession();
 
-  // TODO: wire up useDeleteAcademicSession mutation
   const handleDelete = async () => {
-    console.log('delete session', session.id);
-    // await deleteSession(session.id, { onSuccess: () => { setOpen(false); onSuccess?.(); } });
-    setOpen(false);
-    onSuccess?.();
+    try {
+      await deleteSession.mutateAsync(session.id);
+      toast.add({
+        title: 'Session deleted successfully',
+      });
+      setOpen(false);
+      onSuccess?.();
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to delete session',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -50,10 +65,9 @@ export function DeleteSessionDialog({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-          >
-            Delete
-          </AlertDialogAction>
+            disabled={deleteSession.isPending}
+            render={<Button variant="destructive">Delete</Button>}
+          />
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

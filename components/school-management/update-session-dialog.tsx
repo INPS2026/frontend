@@ -16,6 +16,9 @@ import {
 } from '@/components/ui/dialog';
 import { Field, FieldError, FieldLabel } from '../ui/field';
 import { GetAllAcademicSessionsResponse } from '@/types/config';
+import { useUpdateAcademicSession } from '@/service/api/admin/config.api';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 type Session = Awaited<GetAllAcademicSessionsResponse>['data'][number];
 
@@ -33,6 +36,7 @@ export function UpdateSessionDialog({
   trigger: React.ReactElement;
 }) {
   const [open, setOpen] = useState(false);
+  const updateSession = useUpdateAcademicSession();
 
   const form = useForm<UpdateSessionValues>({
     resolver: zodResolver(updateSessionSchema),
@@ -44,10 +48,23 @@ export function UpdateSessionDialog({
     form.reset({ session: session.session });
   }, [session, form]);
 
-  // TODO: wire up useUpdateAcademicSession mutation
   const onSubmit = async (values: UpdateSessionValues) => {
-    console.log('update session', session.id, values);
-    // await updateSession({ id: session.id, ...values }, { onSuccess: () => setOpen(false) });
+    try {
+      await updateSession.mutateAsync({ id: session.id, data: values });
+      toast.add({
+        title: 'Session updated successfully',
+        description: `Session ${values.session} has been updated successfully.`,
+      });
+      setOpen(false);
+      form.reset();
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to update session',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -84,7 +101,7 @@ export function UpdateSessionDialog({
           <Button
             type="submit"
             form={`update-session-form-${session.id}`}
-            disabled={form.formState.isSubmitting}
+            disabled={updateSession.isPending}
           >
             Save Changes
           </Button>

@@ -1,7 +1,14 @@
+'use client';
+
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
-import { GetAllAcademicSessionsResponse } from '@/types/config';
-import { useQuery } from '@tanstack/react-query';
+import {
+  CreateAcademicSessionResponse,
+  DeleteAcademicSessionResponse,
+  GetAllAcademicSessionsResponse,
+  UpdateAcademicSessionResponse,
+} from '@/types/config';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const keys = {
   all: ['admin-config'] as const,
@@ -23,5 +30,76 @@ export const useGetAllAcademicSessions = () => {
   return useQuery({
     queryKey: keys.list(),
     queryFn: getAllAcademicSessions,
+  });
+};
+
+// Create academic session
+const createAcademicSession = async (data: { session: string }) => {
+  return clientRequest<CreateAcademicSessionResponse>(adminClient, {
+    url: `/api/admin/config/sessions`,
+    method: 'POST',
+    data,
+  });
+};
+
+export const useCreateAcademicSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createAcademicSession,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: keys.list(),
+      });
+    },
+  });
+};
+
+// Update academic session
+const updateAcademicSession = async ({
+  id,
+  data,
+}: {
+  id: string;
+  data: { session: string };
+}) => {
+  return clientRequest<UpdateAcademicSessionResponse>(adminClient, {
+    url: `/api/admin/config/sessions/${id}`,
+    method: 'PATCH',
+    data,
+  });
+};
+
+export const useUpdateAcademicSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateAcademicSession,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: keys.list(),
+      });
+    },
+  });
+};
+
+// Delete academic session
+const deleteAcademicSession = async (id: string) => {
+  return clientRequest<DeleteAcademicSessionResponse>(adminClient, {
+    url: `/api/admin/config/sessions/${id}`,
+    method: 'DELETE',
+  });
+};
+
+export const useDeleteAcademicSession = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteAcademicSession,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: keys.list(),
+      });
+    },
   });
 };

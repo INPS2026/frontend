@@ -9,3 +9,6 @@ export type GetAllAcademicSessionsResponse = ApiResponse<
     terms: Term[];
   }[]
 >;
+export type CreateAcademicSessionResponse = ApiResponse;
+export type UpdateAcademicSessionResponse = ApiResponse;
+export type DeleteAcademicSessionResponse = ApiResponse;

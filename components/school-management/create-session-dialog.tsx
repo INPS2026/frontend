@@ -16,6 +16,9 @@ import {
 } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
 import { Field, FieldError, FieldLabel } from '../ui/field';
+import { useCreateAcademicSession } from '@/service/api/admin/config.api';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 const createSessionSchema = z.object({
   session: z.string().min(1, 'Session name is required'),
@@ -25,16 +28,30 @@ type CreateSessionValues = z.infer<typeof createSessionSchema>;
 
 export function CreateSessionDialog() {
   const [open, setOpen] = useState(false);
+  const createSession = useCreateAcademicSession();
 
   const form = useForm<CreateSessionValues>({
     resolver: zodResolver(createSessionSchema),
     defaultValues: { session: '' },
   });
 
-  // TODO: wire up useCreateAcademicSession mutation
   const onSubmit = async (values: CreateSessionValues) => {
-    console.log('create session', values);
-    // await createSession(values, { onSuccess: () => { form.reset(); setOpen(false); } });
+    try {
+      await createSession.mutateAsync(values);
+      toast.add({
+        title: 'Session created successfully',
+        description: `Session ${values.session} has been created successfully.`,
+      });
+      setOpen(false);
+      form.reset();
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to create session',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -79,7 +96,7 @@ export function CreateSessionDialog() {
           <Button
             type="submit"
             form="create-session-form"
-            disabled={form.formState.isSubmitting}
+            disabled={createSession.isPending}
           >
             Create
           </Button>
