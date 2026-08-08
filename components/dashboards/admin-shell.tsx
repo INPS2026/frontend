@@ -32,6 +32,12 @@ const navLinks = [
     label: 'Staff',
     items: [{ label: 'All Staffs', path: '/dashboard/staffs', icon: Users }],
   },
+  {
+    label: 'Management',
+    items: [
+      { label: 'School Management', path: '/dashboard/school', icon: School },
+    ],
+  },
 ];
 
 export function AdminDashboardShell({

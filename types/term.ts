@@ -1,15 +1,17 @@
 import { ApiResponse } from './api';
 
 export const TERMS = ['FIRST_TERM', 'SECOND_TERM', 'THIRD_TERM'] as const;
-export type Term = (typeof TERMS)[number];
+export type TermEnum = (typeof TERMS)[number];
 
-export type TermStatus = 'CURRENT';
+export type TermStatus = 'CURRENT' | 'UPCOMING';
 
-export type GetActiveTermResponse = ApiResponse<{
+export type Term = {
   id: string;
-  term: Term;
+  term: TermEnum;
   status: TermStatus;
   startDate: string;
   endDate: string;
   sessionId: string;
-}>;
+};
+
+export type GetActiveTermResponse = ApiResponse<Term>;
