@@ -3,7 +3,7 @@
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
 import { useQuery } from '@tanstack/react-query';
-import { GetAllStaffResponse } from '@/types/staff';
+import { GetAllStaffResponse, GetStaffByIdResponse } from '@/types/staff';
 
 type GetStaffParams = {
   role?: string;
@@ -15,7 +15,9 @@ type GetStaffParams = {
 const keys = {
   all: ['admin-staffs'] as const,
   lists: () => [...keys.all, 'list'] as const,
-  list: (params?: unknown) => [...keys.lists(), params],
+  list: (params?: unknown) => [...keys.lists(), params] as const,
+  details: () => [...keys.all, 'detail'] as const,
+  detail: (id: string) => [...keys.details(), id] as const,
 };
 
 // Get all staffs (paginated)
@@ -30,6 +32,22 @@ const getAllStaffs = async (params?: GetStaffParams) => {
 export const useGetAllStaffs = (params?: GetStaffParams) => {
   return useQuery({
     queryKey: keys.list(params),
-    queryFn: () => getAllStaffs(params),
+    queryFn: async () => getAllStaffs(params),
+  });
+};
+
+// Get staff by staffId
+const getStaffStaffId = async (staffId: string) => {
+  return clientRequest<GetStaffByIdResponse>(adminClient, {
+    url: `/api/admin/staff/${staffId}`,
+    method: 'GET',
+  });
+};
+
+export const useGetStaffById = (staffId: string) => {
+  return useQuery({
+    queryKey: keys.detail(staffId),
+    queryFn: async () => getStaffStaffId(staffId),
+    enabled: !!staffId,
   });
 };
