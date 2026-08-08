@@ -8,6 +8,7 @@ import {
   GetAllStaffResponse,
   GetStaffByIdResponse,
   StaffFormOutput,
+  UpdateStaffResponse,
 } from '@/types/staff';
 
 type GetStaffParams = {
@@ -71,6 +72,32 @@ export const useCreateStaff = () => {
 
   return useMutation({
     mutationFn: createStaff,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.all });
+    },
+  });
+};
+
+// Update staff
+const updateStaff = async ({
+  staffId,
+  data,
+}: {
+  staffId: string;
+  data: StaffFormOutput;
+}) => {
+  return clientRequest<UpdateStaffResponse>(adminClient, {
+    url: `/api/admin/staff/${staffId}`,
+    method: 'PATCH',
+    data,
+  });
+};
+
+export const useUpdateStaff = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateStaff,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: keys.all });
     },

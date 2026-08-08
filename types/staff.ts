@@ -1,7 +1,7 @@
 import z from 'zod';
 import { ApiResponse } from './api';
 import { Staff } from './auth';
-import { GENDERS, ROLES } from '@/lib/constants';
+import { GenderEnum, GENDERS, RoleEnum, ROLES } from '@/lib/constants';
 
 export const staffFormSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -18,6 +18,7 @@ export type StaffFormInput = z.input<typeof staffFormSchema>;
 export type StaffFormOutput = z.output<typeof staffFormSchema>;
 
 export type CreateStaffResponse = ApiResponse<Staff>;
+export type UpdateStaffResponse = ApiResponse<Staff>;
 export type GetAllStaffResponse = ApiResponse<Staff[]>;
 export type GetStaffByIdResponse = ApiResponse<{
   id: string;
@@ -25,11 +26,11 @@ export type GetStaffByIdResponse = ApiResponse<{
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  gender: 'MALE' | 'FEMALE';
+  gender: GenderEnum;
   address: string;
   email: string;
   phone: string;
   type: string;
-  role: string;
+  role: RoleEnum;
   status: 'ACTIVE' | 'INACTIVE';
 }>;

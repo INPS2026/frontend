@@ -28,7 +28,7 @@ import {
 import { useState } from 'react';
 import { RoleEnum, ROLES } from '@/lib/constants';
 import { Plus } from 'lucide-react';
-import { StaffForm } from '@/components/staffs/staff-form';
+import { StaffForm } from '@/components/staff/staff-form';
 import { toast } from '@/components/ui/toast';
 import { isAxiosError } from 'axios';
 
