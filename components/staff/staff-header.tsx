@@ -28,7 +28,12 @@ import {
 import { StaffForm } from '@/components/staff/staff-form';
 import type { RoleEnum, GenderEnum } from '@/lib/constants'; // adjust to your actual type location
 import { StaffFormInput } from '@/types/staff';
-import { useUpdateStaff } from '@/service/api/admin/staffs.api';
+import {
+  useDeactivateStaff,
+  useReactivateStaff,
+  useResetStaffPassword,
+  useUpdateStaff,
+} from '@/service/api/admin/staffs.api';
 import { toast } from '../ui/toast';
 import { isAxiosError } from 'axios';
 
@@ -54,7 +59,13 @@ interface StaffHeaderProps {
 export function StaffHeader({ staff }: StaffHeaderProps) {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
+  const [isDeactivateOpen, setIsDeactivateOpen] = useState(false);
+  const [isReactivateOpen, setIsReactivateOpen] = useState(false);
   const updateStaff = useUpdateStaff();
+  const resetPassword = useResetStaffPassword();
+  const reactivateStaff = useReactivateStaff();
+  const deactivateStaff = useDeactivateStaff();
 
   const initials =
     `${staff.firstName[0] ?? ''}${staff.lastName[0] ?? ''}`.toUpperCase();
@@ -84,19 +95,59 @@ export function StaffHeader({ staff }: StaffHeaderProps) {
     }
   };
 
-  const handleResetPassword = () => {
-    // TODO: wire useResetStaffPassword mutation
-    console.log('reset password for', staff.id);
+  const handleResetPassword = async () => {
+    try {
+      await resetPassword.mutateAsync(staff.staffId);
+      toast.add({
+        title: 'Password reset successful',
+        description: `A new temporary password has been generated for ${staff.firstName} ${staff.lastName}.`,
+      });
+      setIsResetPasswordOpen(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to reset password',
+          description: error.message,
+        });
+      }
+    }
   };
 
-  const handleDeactivate = () => {
-    // TODO: wire useDeactivateStaff mutation
-    console.log('deactivate', staff.id);
+  const handleDeactivate = async () => {
+    try {
+      await deactivateStaff.mutateAsync(staff.staffId);
+      toast.add({
+        title: 'Staff deactivated',
+        description: `${staff.firstName} ${staff.lastName} has been deactivated.`,
+      });
+      setIsDeactivateOpen(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to deactivate staff',
+          description: error.message,
+        });
+      }
+    }
   };
 
-  const handleReactivate = () => {
+  const handleReactivate = async () => {
     // TODO: wire useReactivateStaff mutation
-    console.log('reactivate', staff.id);
+    try {
+      await reactivateStaff.mutateAsync(staff.staffId);
+      toast.add({
+        title: 'Staff reactivated',
+        description: `${staff.firstName} ${staff.lastName} has been reactivated.`,
+      });
+      setIsReactivateOpen(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to reactivate staff',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -176,7 +227,10 @@ export function StaffHeader({ staff }: StaffHeaderProps) {
             </DialogContent>
           </Dialog>
 
-          <AlertDialog>
+          <AlertDialog
+            open={isResetPasswordOpen}
+            onOpenChange={setIsResetPasswordOpen}
+          >
             <AlertDialogTrigger
               render={
                 <Button variant="outline">
@@ -194,8 +248,13 @@ export function StaffHeader({ staff }: StaffHeaderProps) {
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleResetPassword}>
+                <AlertDialogCancel disabled={resetPassword.isPending}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleResetPassword}
+                  disabled={resetPassword.isPending}
+                >
                   Reset Password
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -203,7 +262,10 @@ export function StaffHeader({ staff }: StaffHeaderProps) {
           </AlertDialog>
 
           {isActive ? (
-            <AlertDialog>
+            <AlertDialog
+              open={isDeactivateOpen}
+              onOpenChange={setIsDeactivateOpen}
+            >
               <AlertDialogTrigger
                 render={
                   <Button variant="destructive">
@@ -224,15 +286,23 @@ export function StaffHeader({ staff }: StaffHeaderProps) {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeactivate}>
+                  <AlertDialogCancel disabled={deactivateStaff.isPending}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeactivate}
+                    disabled={deactivateStaff.isPending}
+                  >
                     Deactivate
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           ) : (
-            <AlertDialog>
+            <AlertDialog
+              open={isReactivateOpen}
+              onOpenChange={setIsReactivateOpen}
+            >
               <AlertDialogTrigger
                 render={
                   <Button variant="outline">
@@ -252,8 +322,13 @@ export function StaffHeader({ staff }: StaffHeaderProps) {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleReactivate}>
+                  <AlertDialogCancel disabled={reactivateStaff.isPending}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleReactivate}
+                    disabled={reactivateStaff.isPending}
+                  >
                     Reactivate
                   </AlertDialogAction>
                 </AlertDialogFooter>

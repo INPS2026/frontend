@@ -103,3 +103,60 @@ export const useUpdateStaff = () => {
     },
   });
 };
+
+// Reset password
+const resetStaffPassword = async (staffId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/staff/${staffId}/reset-password`,
+    method: 'PATCH',
+  });
+};
+
+export const useResetStaffPassword = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: resetStaffPassword,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.all });
+    },
+  });
+};
+
+// Deactivate Staff
+const deactivateStaff = async (staffId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/staff/${staffId}/deactivate`,
+    method: 'PATCH',
+  });
+};
+
+export const useDeactivateStaff = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deactivateStaff,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.all });
+    },
+  });
+};
+
+// Deactivate Staff
+const reactivateStaff = async (staffId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/staff/${staffId}/reactivate`,
+    method: 'PATCH',
+  });
+};
+
+export const useReactivateStaff = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: reactivateStaff,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.all });
+    },
+  });
+};
