@@ -21,10 +21,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { staffColumns } from '@/lib/columns/staff-columns';
-import { useGetAllStaffs } from '@/service/api/admin/staffs.api';
+import {
+  useCreateStaff,
+  useGetAllStaffs,
+} from '@/service/api/admin/staffs.api';
 import { useState } from 'react';
 import { RoleEnum, ROLES } from '@/lib/constants';
 import { Plus } from 'lucide-react';
+import { StaffForm } from '@/components/staffs/staff-form';
+import { toast } from '@/components/ui/toast';
+import { isAxiosError } from 'axios';
 
 export default function AllStaffsPage() {
   const [pagination, setPagination] = useState({
@@ -41,6 +47,8 @@ export default function AllStaffsPage() {
     includeDeleted,
     role: role as RoleEnum | undefined,
   });
+
+  const createStaff = useCreateStaff();
 
   const staffs = staffsData?.data ?? [];
   const page = staffsData?.meta?.page ?? pagination.page;
@@ -103,7 +111,26 @@ export default function AllStaffsPage() {
               <DialogHeader>
                 <DialogTitle>Add New Staff</DialogTitle>
               </DialogHeader>
-              {/* Form implementation goes here */}
+              <StaffForm
+                isSubmitting={createStaff.isPending}
+                onSubmit={async (val) => {
+                  try {
+                    const res = await createStaff.mutateAsync(val);
+                    toast.add({
+                      title: 'Staff created',
+                      description: res.message,
+                    });
+                    setIsCreateOpen(false);
+                  } catch (error) {
+                    if (isAxiosError(error)) {
+                      toast.add({
+                        title: 'Failed to create staff',
+                        description: error.message,
+                      });
+                    }
+                  }
+                }}
+              />
             </DialogContent>
           </Dialog>
         </div>

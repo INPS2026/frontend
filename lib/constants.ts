@@ -9,3 +9,6 @@ export const ROLES = [
   'SUPPORT',
 ] as const;
 export type RoleEnum = (typeof ROLES)[number];
+
+export const GENDERS = ['MALE', 'FEMALE'] as const;
+export type GenderEnum = (typeof GENDERS)[number];

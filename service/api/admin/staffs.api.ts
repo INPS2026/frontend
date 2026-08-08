@@ -2,8 +2,13 @@
 
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
-import { useQuery } from '@tanstack/react-query';
-import { GetAllStaffResponse, GetStaffByIdResponse } from '@/types/staff';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  CreateStaffResponse,
+  GetAllStaffResponse,
+  GetStaffByIdResponse,
+  StaffFormOutput,
+} from '@/types/staff';
 
 type GetStaffParams = {
   role?: string;
@@ -49,5 +54,25 @@ export const useGetStaffById = (staffId: string) => {
     queryKey: keys.detail(staffId),
     queryFn: async () => getStaffStaffId(staffId),
     enabled: !!staffId,
+  });
+};
+
+// Create staff
+const createStaff = async (data: StaffFormOutput) => {
+  return clientRequest<CreateStaffResponse>(adminClient, {
+    url: `/api/admin/staff`,
+    method: 'POST',
+    data,
+  });
+};
+
+export const useCreateStaff = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createStaff,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.all });
+    },
   });
 };
