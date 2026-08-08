@@ -31,25 +31,15 @@ import {
 import { cn } from '@/lib/utils';
 import { formatTerm } from '@/lib/format';
 import { Field, FieldError, FieldLabel } from '../ui/field';
-import { TERMS } from '@/types/term';
-
-// TODO: replace with real TermEnum / TermStatus values from your types
-const TERM_OPTIONS = ['FIRST_TERM', 'SECOND_TERM', 'THIRD_TERM'] as const;
-const TERM_STATUS_OPTIONS = ['UPCOMING', 'ACTIVE', 'COMPLETED'] as const;
-
-const addTermSchema = z
-  .object({
-    term: z.enum(TERM_OPTIONS),
-    status: z.enum(TERM_STATUS_OPTIONS),
-    startDate: z.date('Start date is required'),
-    endDate: z.date('End date is required'),
-  })
-  .refine((data) => data.endDate > data.startDate, {
-    message: 'End date must be after start date',
-    path: ['endDate'],
-  });
-
-type AddTermValues = z.infer<typeof addTermSchema>;
+import {
+  AddTermInput,
+  AddTermOutput,
+  addTermSchema,
+  TERMS,
+} from '@/types/term';
+import { useCreateTerm } from '@/service/api/admin/config.api';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 export function AddTermDialog({
   sessionId,
@@ -59,15 +49,29 @@ export function AddTermDialog({
   trigger: React.ReactElement;
 }) {
   const [open, setOpen] = useState(false);
+  const createTerm = useCreateTerm();
 
-  const form = useForm<AddTermValues>({
+  const form = useForm<AddTermInput, unknown, AddTermOutput>({
     resolver: zodResolver(addTermSchema),
   });
 
-  // TODO: wire up useCreateTerm mutation
-  const onSubmit = async (values: AddTermValues) => {
-    console.log('add term', sessionId, values);
-    // await createTerm({ sessionId, ...values }, { onSuccess: () => { form.reset(); setOpen(false); } });
+  const onSubmit = async (values: AddTermInput) => {
+    try {
+      await createTerm.mutateAsync({ ...values, sessionId });
+      toast.add({
+        title: 'Term added successfully',
+        description: `Term ${formatTerm(values.term)} has been added successfully.`,
+      });
+      setOpen(false);
+      form.reset();
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to add term',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -103,38 +107,6 @@ export function AddTermDialog({
                     {TERMS.map((t) => (
                       <SelectItem key={t} value={t}>
                         {formatTerm(t)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="status"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Status</FieldLabel>
-                <Select
-                  name={field.name}
-                  onValueChange={(value) => {
-                    if (!value) return;
-                    field.onChange(value);
-                  }}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger id={field.name}>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TERM_STATUS_OPTIONS.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -236,7 +208,7 @@ export function AddTermDialog({
           <Button
             type="submit"
             form={`add-term-form-${sessionId}`}
-            disabled={form.formState.isSubmitting}
+            disabled={createTerm.isPending}
           >
             Add Term
           </Button>

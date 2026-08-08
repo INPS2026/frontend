@@ -9,6 +9,7 @@ import {
   UpdateAcademicSessionResponse,
 } from '@/types/config';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AddTermInput } from '@/types/term';
 
 const keys = {
   all: ['admin-config'] as const,
@@ -100,6 +101,26 @@ export const useDeleteAcademicSession = () => {
       queryClient.invalidateQueries({
         queryKey: keys.list(),
       });
+    },
+  });
+};
+
+// Create new term
+const createTerm = async (data: AddTermInput & { sessionId: string }) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/terms`,
+    method: 'POST',
+    data,
+  });
+};
+
+export const useCreateTerm = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createTerm,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.list() });
     },
   });
 };
