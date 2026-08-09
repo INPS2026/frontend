@@ -13,24 +13,37 @@ import {
 import type { Term } from '@/types/term';
 import { Button } from '../ui/button';
 import { formatTerm } from '@/lib/format';
+import { useDeleteTerm } from '@/service/api/admin/config.api';
+import { isAxiosError } from 'axios';
+import { toast } from '../ui/toast';
 
 export function DeleteTermDialog({
   term,
   open,
   onOpenChange,
-  onSuccess,
 }: {
   term: Term;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
 }) {
-  // TODO: wire up useDeleteTerm mutation
+  const deleteTerm = useDeleteTerm();
+
   const handleDelete = async () => {
-    console.log('delete term', term.id);
-    // await deleteTerm(term.id, { onSuccess: () => { setOpen(false); onSuccess?.(); } });
-    // setOpen(false);
-    onSuccess?.();
+    try {
+      await deleteTerm.mutateAsync(term.id);
+      toast.add({
+        title: 'Term deleted',
+        description: `Term ${formatTerm(term.term)} has been deleted successfully.`,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to delete term',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -47,6 +60,7 @@ export function DeleteTermDialog({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
+            disabled={deleteTerm.isPending}
             render={<Button variant="destructive"> Delete</Button>}
           />
         </AlertDialogFooter>

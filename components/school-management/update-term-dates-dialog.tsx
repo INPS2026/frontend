@@ -23,6 +23,9 @@ import {
 import { cn } from '@/lib/utils';
 import type { Term } from '@/types/term';
 import { Field, FieldError, FieldLabel } from '../ui/field';
+import { useUpdateTermDates } from '@/service/api/admin/config.api';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 const updateTermDatesSchema = z
   .object({
@@ -45,6 +48,8 @@ export function UpdateTermDatesDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const updateTermDates = useUpdateTermDates();
+
   const form = useForm<UpdateTermDatesValues>({
     resolver: zodResolver(updateTermDatesSchema),
     defaultValues: {
@@ -60,10 +65,22 @@ export function UpdateTermDatesDialog({
     });
   }, [term.startDate, term.endDate, form]);
 
-  // TODO: wire up useUpdateTermDates mutation
   const onSubmit = async (values: UpdateTermDatesValues) => {
-    console.log('update term dates', term.id, values);
-    // await updateTermDates({ id: term.id, ...values }, { onSuccess: () => setOpen(false) });
+    try {
+      await updateTermDates.mutateAsync({ termId: term.id, data: values });
+      toast.add({
+        title: 'Term dates updated',
+        description: `Term dates have been updated successfully.`,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to update term dates',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (

@@ -176,3 +176,48 @@ export const useUpdateTermStatus = () => {
     },
   });
 };
+
+// Update term's details (dates)
+const updateTermDates = async ({
+  termId,
+  data,
+}: {
+  termId: string;
+  data: Pick<AddTermInput, 'startDate' | 'endDate'>;
+}) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/terms/${termId}`,
+    method: 'PATCH',
+    data,
+  });
+};
+
+export const useUpdateTermDates = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateTermDates,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.list() });
+    },
+  });
+};
+
+// Delete a term
+const deleteTerm = async (termId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/terms/${termId}`,
+    method: 'DELETE',
+  });
+};
+
+export const useDeleteTerm = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteTerm,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.list() });
+    },
+  });
+};

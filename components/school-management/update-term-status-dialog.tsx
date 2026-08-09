@@ -21,6 +21,9 @@ import {
 } from '@/components/ui/select';
 import { type Term, type TermStatus } from '@/types/term';
 import { Field, FieldError, FieldLabel } from '../ui/field';
+import { useUpdateTermStatus } from '@/service/api/admin/config.api';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 const TERM_STATUS_OPTIONS: TermStatus[] = ['CURRENT', 'UPCOMING', 'COMPLETED'];
 
@@ -43,7 +46,7 @@ export function UpdateTermStatusDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  // const
+  const updateTermStatus = useUpdateTermStatus();
 
   const form = useForm<UpdateTermStatusValues>({
     resolver: zodResolver(updateTermStatusSchema),
@@ -54,10 +57,25 @@ export function UpdateTermStatusDialog({
     form.reset({ status: term.status });
   }, [term.status, form]);
 
-  // TODO: wire up useUpdateTermStatus mutation
   const onSubmit = async (values: UpdateTermStatusValues) => {
-    console.log('update term status', term.id, values);
-    // await updateTermStatus({ id: term.id, ...values }, { onSuccess: () => setOpen(false) });
+    try {
+      await updateTermStatus.mutateAsync({
+        termId: term.id,
+        status: values.status,
+      });
+      toast.add({
+        title: 'Term status updated',
+        description: `Term status has been updated to ${values.status}.`,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to update term status',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -107,7 +125,7 @@ export function UpdateTermStatusDialog({
           <Button
             type="submit"
             form={`update-term-status-form-${term.id}`}
-            disabled={form.formState.isSubmitting}
+            disabled={updateTermStatus.isPending}
           >
             Save Status
           </Button>
