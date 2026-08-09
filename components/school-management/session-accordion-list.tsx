@@ -9,12 +9,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { format } from 'date-fns';
-import { formatTerm } from '@/lib/format';
 import type { GetAllAcademicSessionsResponse } from '@/types/config';
 import { UpdateSessionDialog } from './update-session-dialog';
 import { DeleteSessionDialog } from './delete-session-dialog';
-import { TermStatusBadge } from './term-status-badge';
 import { AddTermDialog } from './add-term-dialog';
+import { TermRow } from './term-row';
 
 type Session = Awaited<GetAllAcademicSessionsResponse>['data'][number];
 
@@ -77,21 +76,7 @@ export function SessionAccordionList({ sessions }: { sessions: Session[] }) {
               ) : (
                 <div className="space-y-2">
                   {session.terms.map((term) => (
-                    <div
-                      key={term.id}
-                      className="flex items-center justify-between rounded-md border px-3 py-2"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {formatTerm(term.term)}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {format(new Date(term.startDate), 'PP')} –{' '}
-                          {format(new Date(term.endDate), 'PP')}
-                        </span>
-                      </div>
-                      <TermStatusBadge status={term.status} />
-                    </div>
+                    <TermRow key={term.id} term={term} />
                   ))}
                 </div>
               )}

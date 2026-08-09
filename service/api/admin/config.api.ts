@@ -9,7 +9,7 @@ import {
   UpdateAcademicSessionResponse,
 } from '@/types/config';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AddTermInput } from '@/types/term';
+import { AddTermInput, TermStatus } from '@/types/term';
 
 const keys = {
   all: ['admin-config'] as const,
@@ -119,6 +119,58 @@ export const useCreateTerm = () => {
 
   return useMutation({
     mutationFn: createTerm,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.list() });
+    },
+  });
+};
+
+// Update a session's status
+const updateSessionStatus = async ({
+  sessionId,
+  status,
+}: {
+  sessionId: string;
+  status: TermStatus;
+}) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/sessions/${sessionId}/status`,
+    method: 'PATCH',
+    data: { status },
+  });
+};
+
+export const useUpdateSessionStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateSessionStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.list() });
+    },
+  });
+};
+
+// Update a term's status
+const updateTermStatus = async ({
+  termId,
+  status,
+}: {
+  termId: string;
+  status: TermStatus;
+}) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/terms/${termId}/status`,
+    method: 'PATCH',
+    data: { status },
+  });
+};
+
+export const useUpdateTermStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateTermStatus,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: keys.list() });
     },
