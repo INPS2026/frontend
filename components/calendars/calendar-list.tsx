@@ -10,11 +10,12 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CalendarDays } from 'lucide-react';
 import { TERM_ORDER } from '@/lib/calendar-utils';
 import type { Calendar } from '@/types/calendar'; // adjust to your actual Calendar type import
 import { formatTerm } from '@/lib/format';
 import { CalendarViewSheet } from './calendar-view-sheet';
+import { CalendarDays, Pencil } from 'lucide-react';
+import { UpdateCalendarDialog } from './update-calendar-dialog';
 
 type CalendarListProps = {
   calendars: Calendar[];
@@ -24,6 +25,7 @@ export function CalendarList({ calendars }: CalendarListProps) {
   const [selectedCalendar, setSelectedCalendar] = useState<Calendar | null>(
     null,
   );
+  const [calendarToEdit, setCalendarToEdit] = useState<Calendar | null>(null);
 
   const groupedByYear = useMemo(() => {
     const map: Record<string, Calendar[]> = {};
@@ -83,14 +85,24 @@ export function CalendarList({ calendars }: CalendarListProps) {
                         {calendar.holidays.length === 1 ? '' : 's'}
                       </p>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedCalendar(calendar)}
-                    >
-                      <CalendarDays className="mr-1.5 size-4" />
-                      View
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCalendarToEdit(calendar)}
+                      >
+                        <Pencil className="mr-1.5 size-4" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedCalendar(calendar)}
+                      >
+                        <CalendarDays className="mr-1.5 size-4" />
+                        View
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -104,6 +116,13 @@ export function CalendarList({ calendars }: CalendarListProps) {
         open={!!selectedCalendar}
         onOpenChange={(open: boolean) => {
           if (!open) setSelectedCalendar(null);
+        }}
+      />
+      <UpdateCalendarDialog
+        calendar={calendarToEdit}
+        open={!!calendarToEdit}
+        onOpenChange={(open) => {
+          if (!open) setCalendarToEdit(null);
         }}
       />
     </>

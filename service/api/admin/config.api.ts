@@ -266,3 +266,29 @@ export const useCreateSchoolCalendar = () => {
     },
   });
 };
+
+// Update school calendar
+const updateSchoolCalendar = async ({
+  calendarId,
+  data,
+}: {
+  calendarId: string;
+  data: CalendarFormOutput;
+}) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/calendars/${calendarId}`,
+    method: 'PATCH',
+    data,
+  });
+};
+
+export const useUpdateSchoolCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateSchoolCalendar,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.list() });
+    },
+  });
+};
