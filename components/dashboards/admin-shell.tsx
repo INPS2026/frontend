@@ -2,7 +2,13 @@
 
 import { useRouter } from 'next/navigation';
 import { AppSidebar } from '../app-sidebar';
-import { LayoutDashboard, School, UserPlus, Users } from 'lucide-react';
+import {
+  CalendarRange,
+  LayoutDashboard,
+  School,
+  UserPlus,
+  Users,
+} from 'lucide-react';
 import { useAuthContext } from '@/lib/auth-context';
 import { useEffect } from 'react';
 
@@ -33,9 +39,13 @@ const navLinks = [
     items: [{ label: 'All Staffs', path: '/dashboard/staffs', icon: Users }],
   },
   {
-    label: 'Management',
+    label: 'School Management',
     items: [
-      { label: 'School Management', path: '/dashboard/school', icon: School },
+      {
+        label: 'Session Management',
+        path: '/dashboard/sessions',
+        icon: CalendarRange,
+      },
     ],
   },
 ];

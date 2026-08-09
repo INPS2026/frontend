@@ -12,8 +12,8 @@ export default function SchoolManagementPage() {
     return (
       <div className="space-y-4">
         <TopBar
-          title="School Management Page"
-          subtitle="Manage and update sessions, terms, etc."
+          title="Session Management"
+          subtitle="Manage and update sessions and terms."
         />
         <div className="px-4">Loading...</div>
       </div>
@@ -25,8 +25,8 @@ export default function SchoolManagementPage() {
   return (
     <div className="space-y-4">
       <TopBar
-        title="School Management Page"
-        subtitle="Manage and update sessions, terms, etc."
+        title="Session Management"
+        subtitle="Manage and update sessions and terms."
       />
       <div className="px-4 space-y-4">
         <div className="flex justify-end">
