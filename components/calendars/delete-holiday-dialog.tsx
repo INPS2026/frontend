@@ -10,7 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useRemoveHoliday } from '@/service/api/admin/config.api';
 import type { Holiday } from '@/types/calendar';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 type DeleteHolidayDialogProps = {
   holiday: Holiday | null;
@@ -23,13 +26,26 @@ export function DeleteHolidayDialog({
   open,
   onOpenChange,
 }: DeleteHolidayDialogProps) {
-  const isPending = false; // TODO: replace with mutation's isPending once wired
+  const removeHoliday = useRemoveHoliday();
+  const isPending = removeHoliday.isPending;
 
   if (!holiday) return null;
 
-  const handleDelete = () => {
-    // TODO: call useDeleteHoliday mutation with { id: holiday.id }
-    // On success: invalidate the calendar/holidays query, toast, then onOpenChange(false)
+  const handleDelete = async () => {
+    try {
+      await removeHoliday.mutateAsync(holiday.id);
+      toast.add({
+        title: 'Holiday removed successfully',
+      });
+      onOpenChange(false);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to remove holiday',
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (

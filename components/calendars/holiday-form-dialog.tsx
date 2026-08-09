@@ -11,6 +11,12 @@ import { Button } from '@/components/ui/button';
 import { HolidayForm } from './holiday-form';
 import type { HolidayFormOutput } from '@/lib/calendar-utils';
 import type { Holiday } from '@/types/calendar';
+import {
+  useAddHoliday,
+  useUpdateHoliday,
+} from '@/service/api/admin/config.api';
+import { toast } from '../ui/toast';
+import { isAxiosError } from 'axios';
 
 const FORM_ID = 'holiday-form';
 
@@ -29,15 +35,43 @@ export function HolidayFormDialog({
   mode,
   holiday,
 }: HolidayFormDialogProps) {
-  const isPending = false; // TODO: replace with mutation's isPending once wired
+  const addHoliday = useAddHoliday();
+  const updateHoliday = useUpdateHoliday();
 
-  const handleSubmit = (values: HolidayFormOutput) => {
-    if (mode === 'create') {
-      // TODO: call useCreateHoliday mutation with { calendarId, ...values }
-      // On success: invalidate the calendar/holidays query, toast, then onOpenChange(false)
-    } else {
-      // TODO: call useUpdateHoliday mutation with { id: holiday.id, ...values }
-      // On success: invalidate the calendar/holidays query, toast, then onOpenChange(false)
+  const isPending = addHoliday.isPending || updateHoliday.isPending;
+
+  const handleSubmit = async (values: HolidayFormOutput) => {
+    try {
+      if (mode === 'create') {
+        await addHoliday.mutateAsync({ calendarId, ...values });
+        toast.add({
+          title: 'Added new holiday to calendar',
+        });
+        onOpenChange(false);
+      } else {
+        if (holiday === null || holiday === undefined) {
+          throw new Error('Called update holiday without holiday Id');
+        }
+
+        await updateHoliday.mutateAsync({
+          holidayId: holiday.id,
+          data: values,
+        });
+        toast.add({
+          title: 'Holiday updated successfully',
+        });
+        onOpenChange(false);
+      }
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: `Failed to ${mode === 'create' ? 'Create' : 'Update'} holiday`,
+          description: error.message,
+        });
+      }
+      toast.add({
+        title: (error as Error).message,
+      });
     }
   };
 

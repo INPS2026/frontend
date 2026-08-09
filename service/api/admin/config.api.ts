@@ -11,7 +11,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AddTermInput, TermEnum, TermStatus } from '@/types/term';
 import { GetSchoolCalendarsResponse } from '@/types/calendar';
-import { CalendarFormOutput } from '@/lib/calendar-utils';
+import { CalendarFormOutput, HolidayFormOutput } from '@/lib/calendar-utils';
 
 const keys = {
   all: ['admin-config'] as const,
@@ -262,7 +262,7 @@ export const useCreateSchoolCalendar = () => {
   return useMutation({
     mutationFn: createSchoolCalendar,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: keys.list() });
+      queryClient.invalidateQueries({ queryKey: keys.lists() }); // was keys.list()
     },
   });
 };
@@ -288,7 +288,72 @@ export const useUpdateSchoolCalendar = () => {
   return useMutation({
     mutationFn: updateSchoolCalendar,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: keys.list() });
+      queryClient.invalidateQueries({ queryKey: keys.lists() }); // was keys.list()
+    },
+  });
+};
+
+// Add holiday to calendar
+const addHoliday = async (data: HolidayFormOutput & { calendarId: string }) => {
+  return clientRequest(adminClient, {
+    url: '/api/admin/config/calendars/holidays',
+    method: 'POST',
+    data,
+  });
+};
+
+export const useAddHoliday = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: addHoliday,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
+    },
+  });
+};
+
+// Update holiday to calendar
+const updateHoliday = async ({
+  holidayId,
+  data,
+}: {
+  holidayId: string;
+  data: HolidayFormOutput;
+}) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/calendars/holidays/${holidayId}`,
+    method: 'PATCH',
+    data,
+  });
+};
+
+export const useUpdateHoliday = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateHoliday,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
+    },
+  });
+};
+
+// Remove holiday from calendar
+const removeHoliday = async (holidayId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/config/calendars/holidays/${holidayId}`,
+    method: 'DELETE',
+  });
+};
+
+export const useRemoveHoliday = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: removeHoliday,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
     },
   });
 };
