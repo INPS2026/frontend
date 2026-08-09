@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { AppSidebar } from '../app-sidebar';
 import {
+  Calendar,
   CalendarRange,
   LayoutDashboard,
   School,
@@ -45,6 +46,11 @@ const navLinks = [
         label: 'Session Management',
         path: '/dashboard/sessions',
         icon: CalendarRange,
+      },
+      {
+        label: 'Calendar Management',
+        path: '/dashboard/calendars',
+        icon: Calendar,
       },
     ],
   },

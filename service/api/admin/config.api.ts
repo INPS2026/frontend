@@ -9,7 +9,8 @@ import {
   UpdateAcademicSessionResponse,
 } from '@/types/config';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AddTermInput, TermStatus } from '@/types/term';
+import { AddTermInput, TermEnum, TermStatus } from '@/types/term';
+import { GetSchoolCalendarsResponse } from '@/types/calendar';
 
 const keys = {
   all: ['admin-config'] as const,
@@ -219,5 +220,28 @@ export const useDeleteTerm = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: keys.list() });
     },
+  });
+};
+
+// Get school calendars with holidays
+const getSchoolCalendars = async (params: {
+  academicYear: string | undefined;
+  term: TermEnum | undefined;
+}) => {
+  return clientRequest<GetSchoolCalendarsResponse>(adminClient, {
+    url: '/api/admin/config/calendars',
+    method: 'GET',
+    params,
+  });
+};
+
+export const useGetSchoolCalendars = (params: {
+  academicYear: string | undefined;
+  term: TermEnum | undefined;
+}) => {
+  return useQuery({
+    queryKey: keys.list(params),
+    queryFn: async () => getSchoolCalendars(params),
+    enabled: !!params.academicYear && !!params.term,
   });
 };
