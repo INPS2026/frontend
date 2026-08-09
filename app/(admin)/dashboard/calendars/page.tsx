@@ -8,6 +8,7 @@ import {
   type CalendarFiltersValue,
 } from '@/components/calendars/calendar-filters';
 import { CalendarList } from '@/components/calendars/calendar-list';
+import { CreateCalendarDialog } from '@/components/calendars/create-calendar-dialog';
 import { getCurrentAcademicYear } from '@/lib/calendar-utils';
 
 export default function CalendarManagementPage() {
@@ -28,7 +29,10 @@ export default function CalendarManagementPage() {
         title="Calendar Management"
         subtitle="Manage school calendars and holidays"
       />
-      <CalendarFilters value={filters} onChange={setFilters} />
+      <div className="flex items-center justify-between px-4">
+        <CalendarFilters value={filters} onChange={setFilters} />
+        <CreateCalendarDialog />
+      </div>
       {isLoading ? (
         <div className="px-4">Loading...</div>
       ) : (

@@ -11,6 +11,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AddTermInput, TermEnum, TermStatus } from '@/types/term';
 import { GetSchoolCalendarsResponse } from '@/types/calendar';
+import { CalendarFormOutput } from '@/lib/calendar-utils';
 
 const keys = {
   all: ['admin-config'] as const,
@@ -243,5 +244,25 @@ export const useGetSchoolCalendars = (params: {
     queryKey: keys.list(params),
     queryFn: async () => getSchoolCalendars(params),
     enabled: !!params.academicYear && !!params.term,
+  });
+};
+
+// Create a new school calendar
+const createSchoolCalendar = async (data: CalendarFormOutput) => {
+  return clientRequest(adminClient, {
+    url: '/api/admin/config/calendars',
+    method: 'POST',
+    data,
+  });
+};
+
+export const useCreateSchoolCalendar = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createSchoolCalendar,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.list() });
+    },
   });
 };
