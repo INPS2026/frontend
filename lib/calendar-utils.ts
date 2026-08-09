@@ -1,6 +1,8 @@
 import { TermEnum, TERMS } from '@/types/term';
 import { z } from 'zod';
 
+export type HolidayType = 'PUBLIC' | 'SCHOOL' | 'EXAM';
+
 export const calendarFormSchema = z
   .object({
     academicYear: z
@@ -18,13 +20,28 @@ export const calendarFormSchema = z
 export type CalendarFormInput = z.input<typeof calendarFormSchema>;
 export type CalendarFormOutput = z.output<typeof calendarFormSchema>;
 
+export const HOLIDAY_TYPES: HolidayType[] = ['PUBLIC', 'SCHOOL', 'EXAM'];
+
+export const holidayFormSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    startDate: z.string().min(1, 'Start date is required'),
+    endDate: z.string().min(1, 'End date is required'),
+    type: z.enum(['PUBLIC', 'SCHOOL', 'EXAM']),
+  })
+  .refine((data) => new Date(data.endDate) >= new Date(data.startDate), {
+    message: 'End date must be on or after the start date',
+    path: ['endDate'],
+  });
+
+export type HolidayFormInput = z.input<typeof holidayFormSchema>;
+export type HolidayFormOutput = z.output<typeof holidayFormSchema>;
+
 export const TERM_ORDER: Record<TermEnum, number> = {
   FIRST_TERM: 0,
   SECOND_TERM: 1,
   THIRD_TERM: 2,
 };
-
-export type HolidayType = 'PUBLIC' | 'SCHOOL' | 'EXAM';
 
 export const HOLIDAY_TYPE_STYLES: Record<
   HolidayType,

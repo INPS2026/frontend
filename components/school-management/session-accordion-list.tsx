@@ -27,12 +27,12 @@ export function SessionAccordionList({ sessions }: { sessions: Session[] }) {
   }
 
   return (
-    <Accordion className="w-full space-y-2 bg-sidebar">
+    <Accordion className="w-full space-y-2">
       {sessions.map((session) => (
         <AccordionItem
           key={session.id}
           value={session.id}
-          className="border rounded-md px-4"
+          className="border rounded-md px-4 bg-sidebar"
         >
           <div className="flex items-center justify-between">
             <AccordionTrigger className="flex-1 hover:no-underline">
