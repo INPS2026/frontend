@@ -34,6 +34,7 @@ import {
   CommunicationType,
   CommunicationTypeEnum,
 } from '@/types/communication';
+import { CommunicationViewDialog } from '@/components/communication/communication-view-dialog';
 
 const STATUS_BADGE_VARIANT: Record<
   CommunicationStatusEnum,
@@ -49,6 +50,8 @@ export default function CommunicationPage() {
   const [status, setStatus] = useState<CommunicationStatusEnum | 'All'>('All');
   const [target, setTarget] = useState<CommunicationTargetEnum | 'All'>('All');
   const [pagination, setPagination] = useState({ page: 1, limit: 20 });
+  const [viewCommunication, setViewCommunication] =
+    useState<Communication | null>(null);
 
   const { data: communicationsData, isLoading } = useGetCommunications({
     ...pagination,
@@ -116,7 +119,7 @@ export default function CommunicationPage() {
           <DropdownMenuContent align="end">
             {/* TODO: wire up view/edit/delete once mutation hooks are available */}
             <DropdownMenuItem
-              onClick={() => console.log('view', row.original.id)}
+              onClick={() => setViewCommunication(row.original)}
             >
               View
             </DropdownMenuItem>
@@ -219,6 +222,12 @@ export default function CommunicationPage() {
           />
         )}
       </div>
+
+      <CommunicationViewDialog
+        communication={viewCommunication}
+        open={!!viewCommunication}
+        onOpenChange={(open) => !open && setViewCommunication(null)}
+      />
     </div>
   );
 }
