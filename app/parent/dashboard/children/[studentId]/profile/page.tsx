@@ -16,7 +16,7 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '@/lib/format';
 import {
   useGetChildProfile,
   useGetOutstandingFees,

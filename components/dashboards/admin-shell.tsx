@@ -7,6 +7,7 @@ import {
   CalendarRange,
   LayoutDashboard,
   School,
+  TrendingUp,
   UserPlus,
   Users,
 } from 'lucide-react';
@@ -51,6 +52,11 @@ const navLinks = [
         label: 'Calendar Management',
         path: '/dashboard/calendars',
         icon: Calendar,
+      },
+      {
+        label: 'Policy Management',
+        path: '/dashboard/promotion-policy',
+        icon: TrendingUp,
       },
     ],
   },
