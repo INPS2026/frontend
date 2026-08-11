@@ -33,6 +33,8 @@ import {
   useCreateCommunication,
   useDeleteCommunication,
   useGetCommunications,
+  usePublishCommunication,
+  useSendCommunicationEmail,
   useUpdateCommunication,
 } from '@/service/api/admin/communication.api';
 import {
@@ -46,6 +48,8 @@ import {
 } from '@/types/communication';
 import { toast } from '@/components/ui/toast';
 import { isAxiosError } from 'axios';
+import { CommunicationPublishDialog } from '@/components/communication/communication-publish-dialog';
+import { CommunicationSendEmailDialog } from '@/components/communication/communication-send-email-dialog';
 
 const STATUS_BADGE_VARIANT: Record<
   CommunicationStatusEnum,
@@ -60,6 +64,8 @@ type ActiveDialog =
   | { type: 'create' }
   | { type: 'update'; entity: Communication }
   | { type: 'delete'; entity: Communication }
+  | { type: 'publish'; entity: Communication }
+  | { type: 'send-email'; entity: Communication }
   | null;
 
 export default function CommunicationPage() {
@@ -81,6 +87,8 @@ export default function CommunicationPage() {
   const createCommunication = useCreateCommunication();
   const updateCommunication = useUpdateCommunication();
   const deleteCommunication = useDeleteCommunication();
+  const publishCommunication = usePublishCommunication();
+  const sendCommunication = useSendCommunicationEmail();
 
   const communications = communicationsData?.data ?? [];
   const meta = communicationsData?.meta;
@@ -126,6 +134,41 @@ export default function CommunicationPage() {
       if (isAxiosError(error)) {
         toast.add({
           title: 'Failed to delete communication',
+          description: error.message,
+        });
+      }
+    }
+  };
+
+  // TODO: wire to usePublishCommunication / useSendCommunicationEmail once available
+  const handlePublishConfirm = async (communication: Communication) => {
+    try {
+      await publishCommunication.mutateAsync(communication.id);
+      toast.add({
+        title: 'Communication was published successfully',
+      });
+      setActiveDialog(null);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to publish communication',
+          description: error.message,
+        });
+      }
+    }
+  };
+
+  const handleSendEmailConfirm = async (communication: Communication) => {
+    try {
+      await sendCommunication.mutateAsync(communication.id);
+      toast.add({
+        title: 'Communication was sent successfully',
+      });
+      setActiveDialog(null);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to send communication',
           description: error.message,
         });
       }
@@ -194,6 +237,22 @@ export default function CommunicationPage() {
               }
             >
               Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={row.original.status === 'PUBLISHED'}
+              onClick={() =>
+                setActiveDialog({ type: 'publish', entity: row.original })
+              }
+            >
+              Publish
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              disabled={row.original.status !== 'PUBLISHED'}
+              onClick={() =>
+                setActiveDialog({ type: 'send-email', entity: row.original })
+              }
+            >
+              Send via email
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive"
@@ -296,11 +355,13 @@ export default function CommunicationPage() {
           />
         )}
       </div>
+
       <CommunicationViewDialog
         communication={viewCommunication}
         open={!!viewCommunication}
         onOpenChange={(open) => !open && setViewCommunication(null)}
       />
+
       <CommunicationFormDialog
         open={
           activeDialog?.type === 'create' || activeDialog?.type === 'update'
@@ -314,6 +375,7 @@ export default function CommunicationPage() {
           createCommunication.isPending || updateCommunication.isPending
         }
       />
+
       <CommunicationDeleteDialog
         communication={
           activeDialog?.type === 'delete' ? activeDialog.entity : null
@@ -322,6 +384,26 @@ export default function CommunicationPage() {
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onConfirm={handleDeleteConfirm}
         isPending={deleteCommunication.isPending}
+      />
+
+      <CommunicationPublishDialog
+        communication={
+          activeDialog?.type === 'publish' ? activeDialog.entity : null
+        }
+        open={activeDialog?.type === 'publish'}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onConfirm={handlePublishConfirm}
+        isPending={publishCommunication.isPending}
+      />
+
+      <CommunicationSendEmailDialog
+        communication={
+          activeDialog?.type === 'send-email' ? activeDialog.entity : null
+        }
+        open={activeDialog?.type === 'send-email'}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onConfirm={handleSendEmailConfirm}
+        isPending={sendCommunication.isPending}
       />
     </div>
   );

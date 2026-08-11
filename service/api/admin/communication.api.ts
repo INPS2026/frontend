@@ -105,3 +105,41 @@ export const useDeleteCommunication = () => {
     },
   });
 };
+
+// Publish communication
+const publishCommunication = async (id: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/communications/${id}/publish`,
+    method: 'PATCH',
+  });
+};
+
+export const usePublishCommunication = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: publishCommunication,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
+    },
+  });
+};
+
+// Send communication email
+const sendCommunicationEmail = async (id: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/communications/${id}/send`,
+    method: 'PATCH',
+  });
+};
+
+export const useSendCommunicationEmail = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: sendCommunicationEmail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
+    },
+  });
+};
