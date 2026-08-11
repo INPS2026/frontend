@@ -28,7 +28,11 @@ import { CommunicationViewDialog } from '@/components/communication/communicatio
 import { CommunicationFormDialog } from '@/components/communication/communication-form-dialog';
 import { CommunicationFormValues } from '@/components/communication/communication-form';
 
-import { useGetCommunications } from '@/service/api/admin/communication.api';
+import {
+  useCreateCommunication,
+  useGetCommunications,
+  useUpdateCommunication,
+} from '@/service/api/admin/communication.api';
 import {
   Communication,
   CommunicationStatus,
@@ -38,6 +42,8 @@ import {
   CommunicationType,
   CommunicationTypeEnum,
 } from '@/types/communication';
+import { toast } from '@/components/ui/toast';
+import { isAxiosError } from 'axios';
 
 const STATUS_BADGE_VARIANT: Record<
   CommunicationStatusEnum,
@@ -70,6 +76,8 @@ export default function CommunicationPage() {
     status: status === 'All' ? undefined : status,
     target: target === 'All' ? undefined : target,
   });
+  const createCommunication = useCreateCommunication();
+  const updateCommunication = useUpdateCommunication();
 
   const communications = communicationsData?.data ?? [];
   const meta = communicationsData?.meta;
@@ -78,13 +86,31 @@ export default function CommunicationPage() {
     setPagination((prev) => ({ ...prev, page: 1 }));
 
   // TODO: wire to useCreateCommunication / useUpdateCommunication once available
-  const handleFormSubmit = (values: CommunicationFormValues) => {
-    if (activeDialog?.type === 'update') {
-      console.log('update', activeDialog.entity.id, values);
-    } else {
-      console.log('create', values);
+  const handleFormSubmit = async (values: CommunicationFormValues) => {
+    try {
+      if (activeDialog?.type === 'update') {
+        await updateCommunication.mutateAsync({
+          communicationId: activeDialog.entity.id,
+          data: values,
+        });
+        toast.add({
+          title: 'Communication updated successfully',
+        });
+      } else {
+        await createCommunication.mutateAsync(values);
+        toast.add({
+          title: 'Communication created successfully',
+        });
+      }
+      setActiveDialog(null);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: `Failed to ${activeDialog?.type === 'update' ? 'update' : 'create'} communication`,
+          description: error.message,
+        });
+      }
     }
-    setActiveDialog(null);
   };
 
   const columns: ColumnDef<Communication>[] = [
@@ -267,6 +293,9 @@ export default function CommunicationPage() {
           activeDialog?.type === 'update' ? activeDialog.entity : null
         }
         onSubmit={handleFormSubmit}
+        isPending={
+          createCommunication.isPending || updateCommunication.isPending
+        }
       />
 
       {/* TODO: CommunicationDeleteDialog once delete mutation hook is available */}

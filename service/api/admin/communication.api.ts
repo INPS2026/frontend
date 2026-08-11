@@ -2,13 +2,14 @@
 
 import { clientRequest } from '@/lib/api-client';
 import { adminClient } from './admin-client';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CommunicationStatusEnum,
   CommunicationTargetEnum,
   CommunicationTypeEnum,
   GetCommunicationsResponse,
 } from '@/types/communication';
+import { CommunicationFormValues } from '@/components/communication/communication-form';
 
 type GetCommunicationsParams = {
   type?: CommunicationTypeEnum;
@@ -37,5 +38,51 @@ export const useGetCommunications = (params: GetCommunicationsParams) => {
   return useQuery({
     queryKey: keys.list(params),
     queryFn: async () => getCommunications(params),
+  });
+};
+
+// Create communication
+const createCommunication = async (data: CommunicationFormValues) => {
+  return clientRequest(adminClient, {
+    url: '/api/admin/communications',
+    method: 'POST',
+    data,
+  });
+};
+
+export const useCreateCommunication = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createCommunication,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
+    },
+  });
+};
+
+// Update communication
+const updateCommunication = async ({
+  communicationId,
+  data,
+}: {
+  communicationId: string;
+  data: CommunicationFormValues;
+}) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/communications/${communicationId}`,
+    method: 'PUT',
+    data,
+  });
+};
+
+export const useUpdateCommunication = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateCommunication,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
+    },
   });
 };
