@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Plus } from 'lucide-react';
 
 import { TopBar } from '@/components/top-bar';
 import { DataTable } from '@/components/ui/data-table';
@@ -24,6 +24,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+import { CommunicationViewDialog } from '@/components/communication/communication-view-dialog';
+import { CommunicationFormDialog } from '@/components/communication/communication-form-dialog';
+import { CommunicationFormValues } from '@/components/communication/communication-form';
+
 import { useGetCommunications } from '@/service/api/admin/communication.api';
 import {
   Communication,
@@ -34,7 +38,6 @@ import {
   CommunicationType,
   CommunicationTypeEnum,
 } from '@/types/communication';
-import { CommunicationViewDialog } from '@/components/communication/communication-view-dialog';
 
 const STATUS_BADGE_VARIANT: Record<
   CommunicationStatusEnum,
@@ -45,11 +48,19 @@ const STATUS_BADGE_VARIANT: Record<
   ARCHIVED: 'secondary',
 };
 
+type ActiveDialog =
+  | { type: 'create' }
+  | { type: 'update'; entity: Communication }
+  | { type: 'delete'; entity: Communication }
+  | null;
+
 export default function CommunicationPage() {
   const [type, setType] = useState<CommunicationTypeEnum | 'All'>('All');
   const [status, setStatus] = useState<CommunicationStatusEnum | 'All'>('All');
   const [target, setTarget] = useState<CommunicationTargetEnum | 'All'>('All');
   const [pagination, setPagination] = useState({ page: 1, limit: 20 });
+
+  const [activeDialog, setActiveDialog] = useState<ActiveDialog>(null);
   const [viewCommunication, setViewCommunication] =
     useState<Communication | null>(null);
 
@@ -65,6 +76,16 @@ export default function CommunicationPage() {
 
   const resetToFirstPage = () =>
     setPagination((prev) => ({ ...prev, page: 1 }));
+
+  // TODO: wire to useCreateCommunication / useUpdateCommunication once available
+  const handleFormSubmit = (values: CommunicationFormValues) => {
+    if (activeDialog?.type === 'update') {
+      console.log('update', activeDialog.entity.id, values);
+    } else {
+      console.log('create', values);
+    }
+    setActiveDialog(null);
+  };
 
   const columns: ColumnDef<Communication>[] = [
     {
@@ -117,20 +138,23 @@ export default function CommunicationPage() {
             }
           />
           <DropdownMenuContent align="end">
-            {/* TODO: wire up view/edit/delete once mutation hooks are available */}
             <DropdownMenuItem
               onClick={() => setViewCommunication(row.original)}
             >
               View
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => console.log('edit', row.original.id)}
+              onClick={() =>
+                setActiveDialog({ type: 'update', entity: row.original })
+              }
             >
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive"
-              onClick={() => console.log('delete', row.original.id)}
+              onClick={() =>
+                setActiveDialog({ type: 'delete', entity: row.original })
+              }
             >
               Delete
             </DropdownMenuItem>
@@ -147,66 +171,71 @@ export default function CommunicationPage() {
         subtitle="Manage communication and newsletter"
       />
       <div className="px-4 space-y-4">
-        <div className="flex flex-wrap gap-2 bg-sidebar p-2 rounded-md">
-          <Select
-            value={type}
-            onValueChange={(value) => {
-              setType((value as CommunicationTypeEnum | 'All') ?? 'All');
-              resetToFirstPage();
-            }}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All types</SelectItem>
-              {CommunicationType.map((t) => (
-                <SelectItem key={t} value={t}>
-                  {t}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center justify-between bg-sidebar p-2 rounded-md">
+          <div className="flex flex-wrap gap-2">
+            <Select
+              value={type}
+              onValueChange={(value) => {
+                setType((value as CommunicationTypeEnum | 'All') ?? 'All');
+                resetToFirstPage();
+              }}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All types</SelectItem>
+                {CommunicationType.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={status}
+              onValueChange={(value) => {
+                setStatus((value as CommunicationStatusEnum | 'All') ?? 'All');
+                resetToFirstPage();
+              }}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All statuses</SelectItem>
+                {CommunicationStatus.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={target}
+              onValueChange={(value) => {
+                setTarget((value as CommunicationTargetEnum | 'All') ?? 'All');
+                resetToFirstPage();
+              }}
+            >
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Target" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All targets</SelectItem>
+                {CommunicationTarget.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          <Select
-            value={status}
-            onValueChange={(value) => {
-              setStatus((value as CommunicationStatusEnum | 'All') ?? 'All');
-              resetToFirstPage();
-            }}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All statuses</SelectItem>
-              {CommunicationStatus.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={target}
-            onValueChange={(value) => {
-              setTarget((value as CommunicationTargetEnum | 'All') ?? 'All');
-              resetToFirstPage();
-            }}
-          >
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Target" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All targets</SelectItem>
-              {CommunicationTarget.map((t) => (
-                <SelectItem key={t} value={t}>
-                  {t}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Button onClick={() => setActiveDialog({ type: 'create' })}>
+            <Plus className="size-4" />
+            New Communication
+          </Button>
         </div>
 
         <DataTable columns={columns} data={communications} />
@@ -228,6 +257,19 @@ export default function CommunicationPage() {
         open={!!viewCommunication}
         onOpenChange={(open) => !open && setViewCommunication(null)}
       />
+
+      <CommunicationFormDialog
+        open={
+          activeDialog?.type === 'create' || activeDialog?.type === 'update'
+        }
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        communication={
+          activeDialog?.type === 'update' ? activeDialog.entity : null
+        }
+        onSubmit={handleFormSubmit}
+      />
+
+      {/* TODO: CommunicationDeleteDialog once delete mutation hook is available */}
     </div>
   );
 }
