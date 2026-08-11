@@ -27,9 +27,11 @@ import {
 import { CommunicationViewDialog } from '@/components/communication/communication-view-dialog';
 import { CommunicationFormDialog } from '@/components/communication/communication-form-dialog';
 import { CommunicationFormValues } from '@/components/communication/communication-form';
+import { CommunicationDeleteDialog } from '@/components/communication/communication-delete-dialog';
 
 import {
   useCreateCommunication,
+  useDeleteCommunication,
   useGetCommunications,
   useUpdateCommunication,
 } from '@/service/api/admin/communication.api';
@@ -78,6 +80,7 @@ export default function CommunicationPage() {
   });
   const createCommunication = useCreateCommunication();
   const updateCommunication = useUpdateCommunication();
+  const deleteCommunication = useDeleteCommunication();
 
   const communications = communicationsData?.data ?? [];
   const meta = communicationsData?.meta;
@@ -85,7 +88,6 @@ export default function CommunicationPage() {
   const resetToFirstPage = () =>
     setPagination((prev) => ({ ...prev, page: 1 }));
 
-  // TODO: wire to useCreateCommunication / useUpdateCommunication once available
   const handleFormSubmit = async (values: CommunicationFormValues) => {
     try {
       if (activeDialog?.type === 'update') {
@@ -107,6 +109,23 @@ export default function CommunicationPage() {
       if (isAxiosError(error)) {
         toast.add({
           title: `Failed to ${activeDialog?.type === 'update' ? 'update' : 'create'} communication`,
+          description: error.message,
+        });
+      }
+    }
+  };
+
+  const handleDeleteConfirm = async (communication: Communication) => {
+    try {
+      await deleteCommunication.mutateAsync(communication.id);
+      toast.add({
+        title: 'Communication deleted successfully',
+      });
+      setActiveDialog(null);
+    } catch (error) {
+      if (isAxiosError(error)) {
+        toast.add({
+          title: 'Failed to delete communication',
           description: error.message,
         });
       }
@@ -277,13 +296,11 @@ export default function CommunicationPage() {
           />
         )}
       </div>
-
       <CommunicationViewDialog
         communication={viewCommunication}
         open={!!viewCommunication}
         onOpenChange={(open) => !open && setViewCommunication(null)}
       />
-
       <CommunicationFormDialog
         open={
           activeDialog?.type === 'create' || activeDialog?.type === 'update'
@@ -297,8 +314,15 @@ export default function CommunicationPage() {
           createCommunication.isPending || updateCommunication.isPending
         }
       />
-
-      {/* TODO: CommunicationDeleteDialog once delete mutation hook is available */}
+      <CommunicationDeleteDialog
+        communication={
+          activeDialog?.type === 'delete' ? activeDialog.entity : null
+        }
+        open={activeDialog?.type === 'delete'}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteCommunication.isPending}
+      />
     </div>
   );
 }

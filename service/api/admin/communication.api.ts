@@ -86,3 +86,22 @@ export const useUpdateCommunication = () => {
     },
   });
 };
+
+// Delete communication
+const deleteCommunication = async (communicationId: string) => {
+  return clientRequest(adminClient, {
+    url: `/api/admin/communications/${communicationId}`,
+    method: 'DELETE',
+  });
+};
+
+export const useDeleteCommunication = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteCommunication,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: keys.lists() });
+    },
+  });
+};
